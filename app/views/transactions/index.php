@@ -1,11 +1,14 @@
-<?php require_once '../app/views/layouts/header.php'; ?>
+<?php require_once APPROOT . '/views/layouts/header.php'; ?>
 
 <div class="container mt-4" x-data="{ showModal: false }">
     <?php flash('transaction_message'); ?>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Transactions</h2>
-        <button @click="showModal = true" class="btn btn-primary">+ Add Transaction</button>
+        <div>
+            <a href="<?= URLROOT ?>/transactioncontroller/export" class="btn btn-outline-success me-2">Export CSV</a>
+            <button @click="showModal = true" class="btn btn-primary">+ Add Transaction</button>
+        </div>
     </div>
 
     <div class="card shadow-sm">
@@ -100,4 +103,4 @@
     </div>
 </div>
 
-<?php require_once '../app/views/layouts/footer.php'; ?>
+<?php require_once APPROOT . '/views/layouts/footer.php'; ?>

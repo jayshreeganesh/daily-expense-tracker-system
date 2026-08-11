@@ -65,4 +65,31 @@ class TransactionController extends Controller {
             exit;
         }
     }
+
+    public function export() {
+        $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id']);
+        
+        $filename = "transactions_export_" . date('Y-m-d') . ".csv";
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '";');
+        
+        $output = fopen('php://output', 'w');
+        
+        // CSV Header
+        fputcsv($output, ['Date', 'Category', 'Type', 'Amount', 'Description']);
+        
+        foreach ($transactions as $tx) {
+            fputcsv($output, [
+                date('Y-m-d', strtotime($tx->transaction_date)),
+                $tx->category_name,
+                ucfirst($tx->type),
+                $tx->amount,
+                $tx->description
+            ]);
+        }
+        
+        fclose($output);
+        exit;
+    }
 }

@@ -8,7 +8,7 @@ class App {
         $url = $this->getUrl();
 
         // Check if first part of url exists as a controller
-        if (isset($url[0]) && file_exists('../app/controllers/' . ucwords($url[0]) . 'Controller.php')) {
+        if (isset($url[0]) && file_exists(APPROOT . '/controllers/' . ucwords($url[0]) . 'Controller.php')) {
             $this->currentController = ucwords($url[0]) . 'Controller';
             unset($url[0]);
         } else {
@@ -17,7 +17,7 @@ class App {
         }
 
         // Require the controller
-        require_once '../app/controllers/' . $this->currentController . '.php';
+        require_once APPROOT . '/controllers/' . $this->currentController . '.php';
         $this->currentController = new $this->currentController;
 
         // Check for second part of url (method)

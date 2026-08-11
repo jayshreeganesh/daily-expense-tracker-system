@@ -1,4 +1,4 @@
-<?php require_once '../app/views/layouts/header.php'; ?>
+<?php require_once APPROOT . '/views/layouts/header.php'; ?>
 
 <div class="container mt-4" x-data="{ showModal: false }">
     <?php flash('category_message'); ?>
@@ -79,4 +79,4 @@
     </div>
 </div>
 
-<?php require_once '../app/views/layouts/footer.php'; ?>
+<?php require_once APPROOT . '/views/layouts/footer.php'; ?>
