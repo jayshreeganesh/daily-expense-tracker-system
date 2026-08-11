@@ -1,16 +1,77 @@
 <?php require_once '../app/views/layouts/header.php'; ?>
 
-<div class="container" x-data="{ showWelcome: true }">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm mb-4" x-show="showWelcome" x-transition>
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <h2 class="card-title text-primary m-0">Welcome to <?= SITENAME ?></h2>
-                    <button class="btn btn-sm btn-outline-secondary" @click="showWelcome = false">Dismiss</button>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Dashboard</h2>
+        <a href="<?= URLROOT ?>/transactioncontroller" class="btn btn-primary">+ New Transaction</a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Income</h5>
+                    <h3>$<?= number_format($data['summary']['income'], 2) ?></h3>
                 </div>
             </div>
-            
-            <p class="lead">Dashboard will be built here in Stage 4.</p>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenses</h5>
+                    <h3>$<?= number_format($data['summary']['expense'], 2) ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-<?= $data['summary']['balance'] >= 0 ? 'primary' : 'warning' ?> shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Net Balance</h5>
+                    <h3>$<?= number_format($data['summary']['balance'], 2) ?></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Recent Transactions</h5>
+        </div>
+        <div class="card-body p-0">
+            <?php if(empty($data['transactions'])) : ?>
+                <p class="p-4 mb-0 text-center text-muted">No recent transactions found. Start by adding one!</p>
+            <?php else : ?>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($data['transactions'] as $tx) : ?>
+                                <tr>
+                                    <td><?= date('M d, Y', strtotime($tx->transaction_date)) ?></td>
+                                    <td><?= htmlspecialchars($tx->description) ?></td>
+                                    <td>
+                                        <span class="badge rounded-pill" style="background-color: <?= $tx->color_code ?>;">
+                                            <?= htmlspecialchars($tx->category_name) ?>
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold <?= $tx->type == 'income' ? 'text-success' : 'text-danger' ?>">
+                                        <?= $tx->type == 'income' ? '+' : '-' ?>$<?= number_format($tx->amount, 2) ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

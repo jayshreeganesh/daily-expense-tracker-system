@@ -25,10 +25,16 @@
                             <a class="nav-link" href="<?= URLROOT ?>/dashboard">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <span class="nav-link text-white">Welcome, <?= $_SESSION['user_name'] ?></span>
+                            <a class="nav-link" href="<?= URLROOT ?>/transactioncontroller">Transactions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= URLROOT ?>/auth/logout">Logout</a>
+                            <a class="nav-link" href="<?= URLROOT ?>/categorycontroller">Categories</a>
+                        </li>
+                        <li class="nav-item">
+                            <span class="nav-link text-white fw-bold">| <?= $_SESSION['user_name'] ?> |</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="<?= URLROOT ?>/auth/logout">Logout</a>
                         </li>
                     <?php else : ?>
                         <li class="nav-item">

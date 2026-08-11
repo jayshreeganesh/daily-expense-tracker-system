@@ -9,6 +9,7 @@ class AuthController extends Controller {
     public function index() {
         if(isLoggedIn()){
             header('Location: ' . URLROOT . '/dashboard');
+            exit;
         } else {
             $this->view('auth/login');
         }
@@ -18,6 +19,7 @@ class AuthController extends Controller {
         // Check if logged in
         if (isLoggedIn()) {
             header('Location: ' . URLROOT . '/dashboard');
+            exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -69,6 +71,7 @@ class AuthController extends Controller {
                 if ($this->userModel->register($data)) {
                     flash('register_success', 'You are registered and can log in');
                     header('Location: ' . URLROOT . '/auth/login');
+                    exit;
                 } else {
                     die('Something went wrong');
                 }
@@ -97,6 +100,7 @@ class AuthController extends Controller {
         // Check if logged in
         if (isLoggedIn()) {
             header('Location: ' . URLROOT . '/dashboard');
+            exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -154,6 +158,7 @@ class AuthController extends Controller {
         $_SESSION['user_email'] = $user->email;
         $_SESSION['user_name'] = $user->name;
         header('Location: ' . URLROOT . '/dashboard');
+        exit;
     }
 
     public function logout() {
@@ -162,5 +167,6 @@ class AuthController extends Controller {
         unset($_SESSION['user_name']);
         session_destroy();
         header('Location: ' . URLROOT . '/auth/login');
+        exit;
     }
 }
