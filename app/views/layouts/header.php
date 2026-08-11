@@ -20,10 +20,24 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <!-- Links will go here based on auth state -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Login</a>
-                    </li>
+                    <?php if(isset($_SESSION['user_id'])) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= URLROOT ?>/dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <span class="nav-link text-white">Welcome, <?= $_SESSION['user_name'] ?></span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= URLROOT ?>/auth/logout">Logout</a>
+                        </li>
+                    <?php else : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= URLROOT ?>/auth/register">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= URLROOT ?>/auth/login">Login</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
