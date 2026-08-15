@@ -16,8 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_email = trim($_POST['admin_email']);
     $admin_pass = trim($_POST['admin_pass']);
     
-    $site_url = rtrim(trim($_POST['site_url']), '/');
-
     try {
         // Step 1: Securely Connect to MySQL
         try {
@@ -51,14 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$admin_name, $admin_email, $hashed_pass]);
         $admin_id = $pdo->lastInsertId();
 
-        // Step 4: Write config.php
+        // Step 4: Write config.php with dynamic URL resolution
         $configContent = "<?php
 define('DB_HOST', '$db_host');
 define('DB_USER', '$db_user');
 define('DB_PASS', '$db_pass');
 define('DB_NAME', '$db_name');
 define('APPROOT', dirname(dirname(__FILE__)));
-define('URLROOT', '$site_url');
+
+// Dynamically determine the URLROOT based on the current server host
+\$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off' || \$_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+define('URLROOT', \$protocol . \$_SERVER['HTTP_HOST']);
 define('SITENAME', 'Daily Expense Tracker');
 ";
         file_put_contents(__DIR__ . '/../app/config/config.php', $configContent);
@@ -173,19 +174,7 @@ define('SITENAME', 'Daily Expense Tracker');
                                     <input type="password" name="admin_pass" class="form-control" required minlength="6" placeholder="Choose a strong password">
                                 </div>
                             
-                            <!-- Step 3: Application Settings -->
-                            <div class="mb-4">
-                                <h5 class="border-bottom pb-2">3. Application Settings</h5>
-                                <div class="mb-3">
-                                    <label>Site URL (Where is this app hosted?)</label>
-                                    <?php 
-                                        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-                                        $defaultUrl = $protocol . $_SERVER['HTTP_HOST'];
-                                    ?>
-                                    <input type="url" name="site_url" class="form-control" required value="<?php echo htmlspecialchars($defaultUrl); ?>" placeholder="e.g. https://myexpenseapp.com">
-                                    <small class="text-muted">Do not include a trailing slash.</small>
-                                </div>
-                            </div>
+
 
                             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
                                 🚀 Install System & Seed Demo Data
