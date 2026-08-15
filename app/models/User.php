@@ -14,6 +14,33 @@ class User {
         $this->db->bind(':password', $data['password']);
 
         if ($this->db->execute()) {
+            $user_id = $this->db->lastInsertId();
+            
+            // Insert Default Categories
+            if (defined('DEFAULT_EXPENSE_CATEGORIES')) {
+                $expense_cats = array_filter(array_map('trim', explode(',', DEFAULT_EXPENSE_CATEGORIES)));
+                foreach($expense_cats as $cat) {
+                    $this->db->query('INSERT INTO categories (user_id, name, type, color_code) VALUES (:uid, :name, :type, :color)');
+                    $this->db->bind(':uid', $user_id);
+                    $this->db->bind(':name', $cat);
+                    $this->db->bind(':type', 'expense');
+                    $this->db->bind(':color', '#' . substr(md5(rand()), 0, 6)); // Random color
+                    $this->db->execute();
+                }
+            }
+
+            if (defined('DEFAULT_INCOME_CATEGORIES')) {
+                $income_cats = array_filter(array_map('trim', explode(',', DEFAULT_INCOME_CATEGORIES)));
+                foreach($income_cats as $cat) {
+                    $this->db->query('INSERT INTO categories (user_id, name, type, color_code) VALUES (:uid, :name, :type, :color)');
+                    $this->db->bind(':uid', $user_id);
+                    $this->db->bind(':name', $cat);
+                    $this->db->bind(':type', 'income');
+                    $this->db->bind(':color', '#' . substr(md5(rand()), 0, 6));
+                    $this->db->execute();
+                }
+            }
+            
             return true;
         } else {
             return false;

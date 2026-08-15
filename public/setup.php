@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $currency = trim($_POST['currency']);
     $timezone = trim($_POST['timezone']);
     $brand_color = trim($_POST['brand_color']);
+    $expense_cats = trim($_POST['expense_cats']);
+    $income_cats = trim($_POST['income_cats']);
     
     try {
         // Step 1: Securely Connect to MySQL
@@ -67,6 +69,8 @@ define('SITENAME', '" . addslashes($site_name) . "');
 define('CURRENCY_SYMBOL', '" . addslashes($currency) . "');
 define('TIMEZONE', '" . addslashes($timezone) . "');
 define('BRAND_COLOR', '" . addslashes($brand_color) . "');
+define('DEFAULT_EXPENSE_CATEGORIES', '" . addslashes($expense_cats) . "');
+define('DEFAULT_INCOME_CATEGORIES', '" . addslashes($income_cats) . "');
 date_default_timezone_set(TIMEZONE);
 
 // Dynamically determine the URLROOT based on the current server host
@@ -219,6 +223,18 @@ define('URLROOT', \$protocol . \$_SERVER['HTTP_HOST']);
                                             <option value="Asia/Kolkata">Asia/Kolkata</option>
                                             <option value="Australia/Sydney">Australia/Sydney</option>
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label>Default Expense Categories</label>
+                                        <input type="text" name="expense_cats" class="form-control" value="Food, Transport, Utilities, Entertainment" required>
+                                        <small class="text-muted">Comma separated</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Default Income Categories</label>
+                                        <input type="text" name="income_cats" class="form-control" value="Salary, Freelance, Investments" required>
+                                        <small class="text-muted">Comma separated</small>
                                     </div>
                                 </div>
                                 <div class="mb-3">

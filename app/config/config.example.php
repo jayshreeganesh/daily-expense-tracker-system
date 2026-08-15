@@ -23,3 +23,7 @@ date_default_timezone_set(TIMEZONE);
 
 // Brand Color
 define('BRAND_COLOR', '#0d6efd');
+
+// Default Categories
+define('DEFAULT_EXPENSE_CATEGORIES', 'Food, Transport, Utilities, Entertainment');
+define('DEFAULT_INCOME_CATEGORIES', 'Salary, Freelance, Investments');
