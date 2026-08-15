@@ -113,35 +113,41 @@ class AdminController extends Controller {
         $zip = new ZipArchive();
         if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
             $dir = realpath(APPROOT . '/../');
-            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY);
+            // Use SELF_FIRST to ensure directory entries are created
+            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::SELF_FIRST);
             
+            // Load exclusions once outside the loop for performance
+            $jsonExclusions = json_decode(file_get_contents(APPROOT . '/config/zip_exclusions.json'), true);
+            $excludeDirs = $jsonExclusions['directories'] ?? [];
+            $excludeFiles = $jsonExclusions['files'] ?? [];
+
             foreach ($files as $name => $file) {
-                if (!$file->isDir()) {
-                    $filePath = $file->getRealPath();
-                    $relativePath = substr($filePath, strlen($dir) + 1);
-                    // Normalize slashes for reliable matching
-                    $normalizedPath = str_replace('\\', '/', $relativePath);
-                    
-                    // Load exclusions from JSON
-                    $jsonExclusions = json_decode(file_get_contents(APPROOT . '/config/zip_exclusions.json'), true);
-                    $excludeDirs = $jsonExclusions['directories'] ?? [];
-                    $excludeFiles = $jsonExclusions['files'] ?? [];
-                    
-                    $skip = false;
-                    
-                    foreach ($excludeDirs as $exclude) {
-                        if (strpos('/' . $normalizedPath, $exclude) !== false) {
-                            $skip = true;
-                            break;
-                        }
-                    }
-                    
-                    if (in_array(basename($normalizedPath), $excludeFiles)) {
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($dir) + 1);
+                
+                // CRITICAL: Normalize slashes to forward slashes for Linux compatibility
+                $normalizedPath = str_replace('\\', '/', $relativePath);
+                
+                // Skip empty root path
+                if (empty($normalizedPath)) continue;
+
+                $skip = false;
+                foreach ($excludeDirs as $exclude) {
+                    if (strpos('/' . $normalizedPath, $exclude) !== false) {
                         $skip = true;
+                        break;
                     }
-                    
-                    if (!$skip) {
-                        $zip->addFile($filePath, $relativePath);
+                }
+                
+                if (!$file->isDir() && in_array(basename($normalizedPath), $excludeFiles)) {
+                    $skip = true;
+                }
+                
+                if (!$skip) {
+                    if ($file->isDir()) {
+                        $zip->addEmptyDir($normalizedPath);
+                    } else {
+                        $zip->addFile($filePath, $normalizedPath);
                     }
                 }
             }
