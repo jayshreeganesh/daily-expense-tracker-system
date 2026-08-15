@@ -11,6 +11,7 @@
     "package.json",
     "package-lock.json",
     "playwright.config.js",
+    "phpunit.xml",
     ".gitignore",
     "setup.php",
     "demo_data.json",
