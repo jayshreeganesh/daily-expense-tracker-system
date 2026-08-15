@@ -36,8 +36,10 @@
                             <a class="nav-link" href="<?= URLROOT ?>/reminder">Reminders</a>
                         </li>
                         <li class="nav-item">
-                    <span class="nav-link text-muted">| <?= $_SESSION['user_name'] ?> (<?= ucfirst($_SESSION['user_role'] ?? 'User') ?>) |</span>
-                </li>
+                            <a class="nav-link text-white fw-bold" href="<?= URLROOT ?>/profile">
+                                👤 <?= htmlspecialchars($_SESSION['user_name']) ?> (<?= ucfirst($_SESSION['user_role'] ?? 'User') ?>)
+                            </a>
+                        </li>
                 <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link text-info fw-bold" href="<?= URLROOT ?>/admin">⚙️ Admin Panel</a>
