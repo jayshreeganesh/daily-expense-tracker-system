@@ -141,17 +141,17 @@ define('SITENAME', 'Daily Expense Tracker');
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label>Database Host</label>
-                                        <input type="text" name="db_host" class="form-control" value="localhost" required>
+                                        <input type="text" name="db_host" class="form-control" placeholder="e.g. localhost or sql123.epizy.com" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label>Database Name</label>
-                                        <input type="text" name="db_name" class="form-control" value="expense_tracker" required>
+                                        <input type="text" name="db_name" class="form-control" placeholder="e.g. icei_12345_expense" required>
                                     </div>
                                 </div>
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <label>Database User</label>
-                                        <input type="text" name="db_user" class="form-control" value="root" required>
+                                        <input type="text" name="db_user" class="form-control" placeholder="e.g. icei_12345" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label>Database Password</label>
