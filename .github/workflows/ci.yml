@@ -60,7 +60,7 @@ jobs:
           
       - name: Run Dynamic SaaS Installer (Zero-Config DB Setup & Seeding)
         run: |
-          curl -X POST http://127.0.0.1:8080/setup.php \
+          OUTPUT=$(curl -s -X POST http://127.0.0.1:8080/setup.php \
             -d "db_host=127.0.0.1" \
             -d "db_name=expense_tracker" \
             -d "db_user=root" \
@@ -73,7 +73,12 @@ jobs:
             -d "timezone=UTC" \
             -d "brand_color=#0d6efd" \
             -d "expense_cats=Food,Transport,Utilities" \
-            -d "income_cats=Salary,Freelance"
+            -d "income_cats=Salary,Freelance")
+          if [[ "$OUTPUT" != *"Setup Complete!"* ]]; then
+            echo "Installer failed! Output: $OUTPUT"
+            exit 1
+          fi
+          echo "Installer succeeded."
             
       - name: Setup Node.js
         uses: actions/setup-node@v4
