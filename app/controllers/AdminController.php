@@ -132,8 +132,12 @@ class AdminController extends Controller {
                 if (empty($normalizedPath)) continue;
 
                 $skip = false;
+                
+                // Append trailing slash for directory matching
+                $checkPath = '/' . $normalizedPath . ($file->isDir() ? '/' : '');
+                
                 foreach ($excludeDirs as $exclude) {
-                    if (strpos('/' . $normalizedPath, $exclude) !== false) {
+                    if (strpos($checkPath, $exclude) !== false) {
                         $skip = true;
                         break;
                     }

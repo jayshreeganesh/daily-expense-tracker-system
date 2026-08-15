@@ -3,6 +3,7 @@
     "/.git/",
     "/node_modules/",
     "/tests/",
+    "/test/",
     "/screenshots/",
     "/test-results/",
     "/playwright-report/"
