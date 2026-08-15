@@ -133,14 +133,14 @@ class Admin {
 
         // 2. Ensure the Portfolio 'Demo Admin' user exists for recruiters
         $this->db->query('SELECT id FROM users WHERE email = :email');
-        $this->db->bind(':email', 'admin@example.com');
+        $this->db->bind(':email', 'demoadmin@example.com');
         $demoAdmin = $this->db->single();
         
         if (!$demoAdmin) {
             $this->db->query('INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)');
             $this->db->bind(':name', 'Demo Admin');
-            $this->db->bind(':email', 'admin@example.com');
-            $this->db->bind(':password', password_hash('password123', PASSWORD_DEFAULT));
+            $this->db->bind(':email', 'demoadmin@example.com');
+            $this->db->bind(':password', password_hash('demoadmin123', PASSWORD_DEFAULT));
             $this->db->bind(':role', 'admin');
             $this->db->execute();
             $demoAdminId = $this->db->lastInsertId();
