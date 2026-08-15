@@ -16,12 +16,14 @@ class DashboardController extends Controller {
         $transactions = $this->transactionModel->getTransactionsByUser($user_id, 5); // get last 5
         $summary = $this->transactionModel->getSummaryByUser($user_id);
         $expensesByCategory = $this->transactionModel->getExpensesByCategory($user_id);
+        $weeklyTrends = $this->transactionModel->getWeeklyTrends($user_id);
 
         $data = [
             'title' => 'Dashboard',
             'transactions' => $transactions,
             'summary' => $summary,
-            'chartData' => $expensesByCategory
+            'chartData' => $expensesByCategory,
+            'weeklyTrends' => $weeklyTrends
         ];
         
         $this->view('dashboard/index', $data);

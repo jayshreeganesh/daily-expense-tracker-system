@@ -100,4 +100,9 @@ class Transaction {
         }
         return false;
     }
+    public function getWeeklyTrends($user_id) {
+        $this->db->query('SELECT DATE(transaction_date) as date, SUM(amount) as total FROM transactions WHERE user_id = :user_id AND type = "expense" AND transaction_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(transaction_date) ORDER BY date ASC');
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->resultSet();
+    }
 }

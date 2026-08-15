@@ -80,7 +80,7 @@
 
         <!-- Expense Chart -->
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm h-100 mb-3">
                 <div class="card-header bg-white">
                     <h5 class="mb-0">Expenses by Category</h5>
                 </div>
@@ -89,6 +89,18 @@
                         <p class="text-center text-muted mt-5">No expense data available.</p>
                     <?php else : ?>
                         <canvas id="expenseChart"></canvas>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Weekly Trends</h5>
+                </div>
+                <div class="card-body">
+                    <?php if(empty($data['weeklyTrends'])) : ?>
+                        <p class="text-center text-muted mt-5">No weekly data available.</p>
+                    <?php else : ?>
+                        <canvas id="trendsChart"></canvas>
                     <?php endif; ?>
                 </div>
             </div>
@@ -119,6 +131,32 @@
                     responsive: true,
                     plugins: {
                         legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        const trendsData = <?= json_encode($data['weeklyTrends'] ?? []) ?>;
+        if(trendsData && trendsData.length > 0) {
+            const ctx2 = document.getElementById('trendsChart').getContext('2d');
+            const labels2 = trendsData.map(item => item.date);
+            const data2 = trendsData.map(item => item.total);
+
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labels2,
+                    datasets: [{
+                        label: 'Daily Expenses',
+                        data: data2,
+                        backgroundColor: '#dc3545',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
                     }
                 }
             });
