@@ -16,7 +16,7 @@
                         <div class="card-body">
                             <h5 class="card-title <?= $reminder->status == 'paid' ? 'text-decoration-line-through text-muted' : '' ?>"><?= htmlspecialchars($reminder->title) ?></h5>
                             <h6 class="card-subtitle mb-2 text-muted">Due: <?= date('M d, Y', strtotime($reminder->due_date)) ?></h6>
-                            <p class="card-text fw-bold text-danger">Amount: $<?= number_format($reminder->amount, 2) ?></p>
+                            <p class="card-text fw-bold text-danger">Amount: <?= CURRENCY_SYMBOL ?><?= number_format($reminder->amount, 2) ?></p>
                         </div>
                         <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
                             <?php if($reminder->status == 'pending'): ?>

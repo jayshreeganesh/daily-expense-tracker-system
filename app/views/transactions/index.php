@@ -44,7 +44,7 @@
                                         </span>
                                     </td>
                                     <td class="fw-bold <?= $tx->type == 'income' ? 'text-success' : 'text-danger' ?>">
-                                        <?= $tx->type == 'income' ? '+' : '-' ?>$<?= number_format($tx->amount, 2) ?>
+                                        <?= $tx->type == 'income' ? '+' : '-' ?><?= CURRENCY_SYMBOL ?><?= number_format($tx->amount, 2) ?>
                                     </td>
                                     <td>
                                         <form action="<?= URLROOT; ?>/transaction/delete/<?= $tx->id ?>" method="post" class="d-inline">

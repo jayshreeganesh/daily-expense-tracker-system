@@ -16,6 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_email = trim($_POST['admin_email']);
     $admin_pass = trim($_POST['admin_pass']);
     
+    $site_name = trim($_POST['site_name']);
+    $currency = trim($_POST['currency']);
+    $timezone = trim($_POST['timezone']);
+    
     try {
         // Step 1: Securely Connect to MySQL
         try {
@@ -57,10 +61,15 @@ define('DB_PASS', '$db_pass');
 define('DB_NAME', '$db_name');
 define('APPROOT', dirname(dirname(__FILE__)));
 
+// Dynamic System Configuration
+define('SITENAME', '" . addslashes($site_name) . "');
+define('CURRENCY_SYMBOL', '" . addslashes($currency) . "');
+define('TIMEZONE', '" . addslashes($timezone) . "');
+date_default_timezone_set(TIMEZONE);
+
 // Dynamically determine the URLROOT based on the current server host
 \$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off' || \$_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
 define('URLROOT', \$protocol . \$_SERVER['HTTP_HOST']);
-define('SITENAME', 'Daily Expense Tracker');
 ";
         file_put_contents(__DIR__ . '/../app/config/config.php', $configContent);
 
@@ -186,6 +195,31 @@ define('SITENAME', 'Daily Expense Tracker');
                                 </div>
                             
 
+
+                            <!-- Step 3: Application Settings -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2">3. Application Settings</h5>
+                                <div class="mb-3">
+                                    <label>Site Name</label>
+                                    <input type="text" name="site_name" class="form-control" value="Daily Expense Tracker" required>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label>Currency Symbol</label>
+                                        <input type="text" name="currency" class="form-control" value="$" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Timezone</label>
+                                        <select name="timezone" class="form-control" required>
+                                            <option value="UTC">UTC</option>
+                                            <option value="America/New_York">America/New_York</option>
+                                            <option value="Europe/London">Europe/London</option>
+                                            <option value="Asia/Kolkata">Asia/Kolkata</option>
+                                            <option value="Australia/Sydney">Australia/Sydney</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
 
                             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
                                 🚀 Install System & Seed Demo Data

@@ -12,7 +12,7 @@
             <div class="card text-white bg-success shadow-sm mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Total Income</h5>
-                    <h3>$<?= number_format($data['summary']['income'], 2) ?></h3>
+                    <h3><?= CURRENCY_SYMBOL ?><?= number_format($data['summary']['income'], 2) ?></h3>
                 </div>
             </div>
         </div>
@@ -20,7 +20,7 @@
             <div class="card text-white bg-danger shadow-sm mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Total Expenses</h5>
-                    <h3>$<?= number_format($data['summary']['expense'], 2) ?></h3>
+                    <h3><?= CURRENCY_SYMBOL ?><?= number_format($data['summary']['expense'], 2) ?></h3>
                 </div>
             </div>
         </div>
@@ -28,7 +28,7 @@
             <div class="card text-white bg-<?= $data['summary']['balance'] >= 0 ? 'primary' : 'warning' ?> shadow-sm mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Net Balance</h5>
-                    <h3>$<?= number_format($data['summary']['balance'], 2) ?></h3>
+                    <h3><?= CURRENCY_SYMBOL ?><?= number_format($data['summary']['balance'], 2) ?></h3>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                                         </span>
                                     </td>
                                     <td class="fw-bold <?= $tx->type == 'income' ? 'text-success' : 'text-danger' ?>">
-                                        <?= $tx->type == 'income' ? '+' : '-' ?>$<?= number_format($tx->amount, 2) ?>
+                                        <?= $tx->type == 'income' ? '+' : '-' ?><?= CURRENCY_SYMBOL ?><?= number_format($tx->amount, 2) ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

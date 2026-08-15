@@ -9,7 +9,14 @@ define('DB_NAME', 'YOUR_DATABASE_NAME');
 define('APPROOT', dirname(dirname(__FILE__)));
 
 // URL Root
-define('URLROOT', 'http://localhost:8080');
+define('URLROOT', 'http://localhost/expense_tracker');
 
 // Site Name
 define('SITENAME', 'Daily Expense Tracker');
+
+// Currency Symbol
+define('CURRENCY_SYMBOL', '$');
+
+// Timezone
+define('TIMEZONE', 'UTC');
+date_default_timezone_set(TIMEZONE);

@@ -37,7 +37,7 @@
             <div class="card bg-info text-white shadow-sm h-100">
                 <div class="card-body">
                     <h5 class="card-title">Platform Total Income Flow</h5>
-                    <h2 class="display-5">$<?= number_format($data['stats']['total_money'], 2) ?></h2>
+                    <h2 class="display-5"><?= CURRENCY_SYMBOL ?><?= number_format($data['stats']['total_money'], 2) ?></h2>
                 </div>
             </div>
         </div>
