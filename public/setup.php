@@ -49,6 +49,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$admin_name, $admin_email, $hashed_pass]);
         $admin_id = $pdo->lastInsertId();
 
+        // Step 3.1: Create Portfolio Demo Admin
+        $stmt->execute(['Demo Admin', 'demoadmin@example.com', password_hash('demoadmin123', PASSWORD_DEFAULT)]);
+        $demoAdminId = $pdo->lastInsertId();
+
+        // Step 3.2: Create Portfolio Demo User
+        $stmtUser = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'user')");
+        $stmtUser->execute(['Demo User', 'demouser@example.com', password_hash('demouser123', PASSWORD_DEFAULT)]);
+        $demoUserId = $pdo->lastInsertId();
+
+        // We need to seed data for all three accounts!
+        $targetUsers = [$admin_id, $demoAdminId, $demoUserId];
+
         // Step 4: Write config.php with dynamic URL resolution
         $configContent = "<?php
 define('DB_HOST', '$db_host');
@@ -73,24 +85,25 @@ define('SITENAME', 'Daily Expense Tracker');
 
             $stmtCat = $pdo->prepare("INSERT INTO categories (user_id, name, type, color_code) VALUES (?, ?, ?, ?)");
             $stmtTxn = $pdo->prepare("INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (?, ?, ?, ?, ?, ?)");
-
-            $catIds = [];
-            foreach ($categories as $cat) {
-                $stmtCat->execute([$admin_id, $cat['name'], $cat['type'], $cat['color_code']]);
-                $catIds[] = $pdo->lastInsertId();
-            }
-
-            foreach ($transactions as $txn) {
-                if (isset($catIds[$txn['category_index']])) {
-                    $stmtTxn->execute([$admin_id, $catIds[$txn['category_index']], $txn['amount'], $txn['type'], date('Y-m-d'), $txn['description']]);
-                }
-            }
-
-            $reminders = $demoData['reminders'] ?? [];
             $stmtRem = $pdo->prepare("INSERT INTO reminders (user_id, title, amount, due_date) VALUES (?, ?, ?, ?)");
-            foreach ($reminders as $rem) {
-                $dueDate = date('Y-m-d', strtotime('+' . $rem['due_date_offset'] . ' days'));
-                $stmtRem->execute([$admin_id, $rem['title'], $rem['amount'], $dueDate]);
+
+            foreach ($targetUsers as $targetUserId) {
+                $catIds = [];
+                foreach ($categories as $cat) {
+                    $stmtCat->execute([$targetUserId, $cat['name'], $cat['type'], $cat['color_code']]);
+                    $catIds[] = $pdo->lastInsertId();
+                }
+
+                foreach ($transactions as $txn) {
+                    if (isset($catIds[$txn['category_index']])) {
+                        $stmtTxn->execute([$targetUserId, $catIds[$txn['category_index']], $txn['amount'], $txn['type'], date('Y-m-d'), $txn['description']]);
+                    }
+                }
+
+                foreach ($reminders as $rem) {
+                    $dueDate = date('Y-m-d', strtotime('+' . $rem['due_date_offset'] . ' days'));
+                    $stmtRem->execute([$targetUserId, $rem['title'], $rem['amount'], $dueDate]);
+                }
             }
         }
 
