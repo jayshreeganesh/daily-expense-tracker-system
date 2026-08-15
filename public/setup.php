@@ -71,6 +71,13 @@ define('SITENAME', 'Daily Expense Tracker');
                     $stmtTxn->execute([$admin_id, $catIds[$txn['category_index']], $txn['amount'], $txn['type'], date('Y-m-d'), $txn['description']]);
                 }
             }
+
+            $reminders = $demoData['reminders'] ?? [];
+            $stmtRem = $pdo->prepare("INSERT INTO reminders (user_id, title, amount, due_date) VALUES (?, ?, ?, ?)");
+            foreach ($reminders as $rem) {
+                $dueDate = date('Y-m-d', strtotime('+' . $rem['due_date_offset'] . ' days'));
+                $stmtRem->execute([$admin_id, $rem['title'], $rem['amount'], $dueDate]);
+            }
         }
 
         // Step 6: Create Lock File
