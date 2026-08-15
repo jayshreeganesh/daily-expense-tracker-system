@@ -6,41 +6,50 @@ A professional, responsive, and dynamic Expense Tracker built from scratch using
 
 1. **Custom MVC Architecture**: Hand-coded Model-View-Controller framework without relying on heavy libraries like Laravel or CodeIgniter.
 2. **User Authentication**: Secure login and registration with password hashing (Bcrypt) and session management.
-3. **Interactive Dashboard**: Overview of Total Income, Total Expenses, and Net Balance with dynamic color coding and recent transaction history.
-4. **Category Management**: Create and manage custom categories (e.g., Food, Rent, Salary) assigning custom color codes and types.
-5. **Transaction Management (CRUD)**: Log new incomes and expenses linked to specific categories.
-6. **Alpine.js Interactivity**: Modern, fast UI with instant pop-up modals for adding categories and transactions without page reloads.
-7. **Pro Export Feature**: Export your transactions into a clean `.csv` format instantly.
-8. **Dynamic Server Compatibility**: Built-in routing works seamlessly across Apache, Nginx, and the PHP Built-in Server.
+## 🚀 Core Features
+- **User Authentication**: Secure registration and login using PHP `password_hash` and `password_verify`.
+- **Expense & Income Tracking**: Easily record transactions, categorize them, and specify the date and amount.
+- **Dynamic Dashboard**: Visualize your financial flow with interactive **Chart.js** graphs.
+- **Pagination & Filtering**: Efficiently browse transaction history with date filters and pagination.
+- **Bill Reminders**: Set upcoming bill reminders, track due dates, and mark them as paid.
+- **Export Data**: Download your transaction history instantly as a `.csv` file.
 
-## 🛠️ Tech Stack
+## 👑 Enterprise SaaS Features (Super Admin Panel)
+- **Role-Based Access Control (RBAC)**: Supports `User`, `Recruiter` (Read-Only Admin), and `Super Admin` roles.
+- **Audit Logging System**: The backend silently tracks and logs all critical database interactions for accountability.
+- **Bulk CSV Importing**: Admins can download a CSV template and upload it to bulk-insert transactions.
+- **System Operations Engine**: 
+  - One-click MySQL Database Backup `.sql` downloads.
+  - One-click UI button to Seed Demo Data for testing.
+  - One-click UI button to export the entire project source code into a clean `.zip`.
 
-- **Backend**: Custom PHP MVC (Object-Oriented PHP)
-- **Database**: MySQL (PDO for secure, parameterized database interactions)
-- **Frontend Styling**: Bootstrap 5 (CSS Framework for responsive UI)
-- **Frontend Logic**: Alpine.js (Lightweight JavaScript for modals and reactive UI)
+## 🛠️ Technology Stack
+- **Backend**: PHP 8.x (Custom MVC Architecture)
+- **Database**: MySQL (PDO Wrapper)
+- **Frontend**: HTML5, CSS3, Bootstrap 5, Alpine.js
+- **Visuals**: Chart.js
+- **Security**: CSRF Protection Tokens, Prepared Statements (SQLi prevention), XSS sanitization.
 
-## 🚀 How to Run Locally
-
-### Prerequisites
-- PHP 8.0+
-- MySQL Server (e.g., XAMPP, WAMP, Laragon, or standalone)
-
-### Installation & Setup
-
-1. **Clone the repository**:
+## 📥 Installation & Setup
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/daily-expense-tracker-system.git
-   cd daily-expense-tracker-system
+   git clone <your-repo-url>
+   ```
+2. **Database Setup:**
+   - Create a MySQL database named `expense_tracker`.
+   - Run the provided `.sql` migrations or trigger the seeding script.
+3. **Configure the App:**
+   - Open `app/config/config.php` and update `DB_USER` and `DB_PASS` to match your local environment.
+   - Ensure `URLROOT` is set correctly (e.g., `http://localhost:8080`).
+4. **Run the Server:**
+   ```bash
+   php -S localhost:8080 -t public
    ```
 
-2. **Database Setup**:
-   - Create a new MySQL database named `expense_tracker`.
-   - Import the provided `database.sql` file into your MySQL database to create the `users`, `categories`, and `transactions` tables.
-
-3. **Configuration (Optional)**:
-   - The application automatically configures the Base URL. 
-   - If your database password is not `root`, update the database credentials in `app/config/config.php`.
+## 🔒 Demo Credentials
+- **Super Admin**: `admin@example.com` / `admin123`
+- **Recruiter Demo**: `demo_admin@example.com` / `demoadmin123`
+- **Standard User**: `user@example.com` / `user123`
 
 ### Starting the Server
 

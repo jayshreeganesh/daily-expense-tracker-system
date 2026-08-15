@@ -44,14 +44,14 @@
     </div>
 
     <!-- AlpineJS Modal for Add Category -->
-    <div x-show="showModal" style="display: none;" class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div :class="{ 'd-block': showModal }" class="modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title">Add New Category</h5>
                     <button type="button" class="btn-close" @click="showModal = false"></button>
                 </div>
-                <form action="<?= URLROOT; ?>/categorycontroller/add" method="post">
+                <form action="<?= URLROOT; ?>/category/add" method="post">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Category Name</label>

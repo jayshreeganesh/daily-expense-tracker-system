@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="<?= URLROOT ?>/public/css/style.css">
 </head>
 <body class="bg-light">
@@ -25,14 +27,22 @@
                             <a class="nav-link" href="<?= URLROOT ?>/dashboard">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= URLROOT ?>/transactioncontroller">Transactions</a>
+                            <a class="nav-link" href="<?= URLROOT ?>/transaction">Transactions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= URLROOT ?>/categorycontroller">Categories</a>
+                            <a class="nav-link" href="<?= URLROOT ?>/category">Categories</a>
                         </li>
                         <li class="nav-item">
-                            <span class="nav-link text-white fw-bold">| <?= $_SESSION['user_name'] ?> |</span>
+                            <a class="nav-link" href="<?= URLROOT ?>/reminder">Reminders</a>
                         </li>
+                        <li class="nav-item">
+                    <span class="nav-link text-muted">| <?= $_SESSION['user_name'] ?> (<?= ucfirst($_SESSION['user_role'] ?? 'User') ?>) |</span>
+                </li>
+                <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                    <li class="nav-item">
+                        <a class="nav-link text-info fw-bold" href="<?= URLROOT ?>/admin">⚙️ Admin Panel</a>
+                    </li>
+                <?php endif; ?>
                         <li class="nav-item">
                             <a class="nav-link text-warning" href="<?= URLROOT ?>/auth/logout">Logout</a>
                         </li>

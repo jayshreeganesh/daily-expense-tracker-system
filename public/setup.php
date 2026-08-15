@@ -1,0 +1,165 @@
+<?php
+if (file_exists(__DIR__ . '/../setup.lock')) {
+    die("Setup is already complete. Please delete setup.lock if you wish to run the installer again.");
+}
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $db_host = trim($_POST['db_host']);
+    $db_user = trim($_POST['db_user']);
+    $db_pass = trim($_POST['db_pass']);
+    $db_name = trim($_POST['db_name']);
+    
+    $admin_name = trim($_POST['admin_name']);
+    $admin_email = trim($_POST['admin_email']);
+    $admin_pass = trim($_POST['admin_pass']);
+
+    try {
+        // Step 1: Connect to MySQL without database to create it if it doesn't exist
+        $pdo = new PDO("mysql:host=$db_host", $db_user, $db_pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
+        $pdo->exec("USE `$db_name`");
+
+        // Step 2: Import database.sql schema
+        $sqlFile = __DIR__ . '/../database.sql';
+        if (file_exists($sqlFile)) {
+            $sql = file_get_contents($sqlFile);
+            $pdo->exec($sql);
+        } else {
+            throw new Exception("database.sql file missing!");
+        }
+
+        // Step 3: Create Super Admin Account
+        $hashed_pass = password_hash($admin_pass, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')");
+        $stmt->execute([$admin_name, $admin_email, $hashed_pass]);
+        $admin_id = $pdo->lastInsertId();
+
+        // Step 4: Write config.php
+        $configContent = "<?php
+define('DB_HOST', '$db_host');
+define('DB_USER', '$db_user');
+define('DB_PASS', '$db_pass');
+define('DB_NAME', '$db_name');
+define('APPROOT', dirname(dirname(__FILE__)));
+define('URLROOT', 'http://localhost:8080');
+define('SITENAME', 'Daily Expense Tracker');
+";
+        file_put_contents(__DIR__ . '/../app/config/config.php', $configContent);
+
+        // Step 5: Seed Demo Data from JSON
+        $jsonContent = file_get_contents(__DIR__ . '/../app/config/demo_data.json');
+        if ($jsonContent) {
+            $demoData = json_decode($jsonContent, true);
+            $categories = $demoData['categories'] ?? [];
+            $transactions = $demoData['transactions'] ?? [];
+
+            $stmtCat = $pdo->prepare("INSERT INTO categories (user_id, name, type, color_code) VALUES (?, ?, ?, ?)");
+            $stmtTxn = $pdo->prepare("INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (?, ?, ?, ?, ?, ?)");
+
+            $catIds = [];
+            foreach ($categories as $cat) {
+                $stmtCat->execute([$admin_id, $cat['name'], $cat['type'], $cat['color_code']]);
+                $catIds[] = $pdo->lastInsertId();
+            }
+
+            foreach ($transactions as $txn) {
+                if (isset($catIds[$txn['category_index']])) {
+                    $stmtTxn->execute([$admin_id, $catIds[$txn['category_index']], $txn['amount'], $txn['type'], date('Y-m-d'), $txn['description']]);
+                }
+            }
+        }
+
+        // Step 6: Create Lock File
+        file_put_contents(__DIR__ . '/../setup.lock', 'LOCKED ' . date('Y-m-d H:i:s'));
+
+        $success = "Setup Complete! The system is locked and secured. Redirecting to login...";
+        header("refresh:3;url=index.php");
+    } catch (Exception $e) {
+        $error = "Setup Failed: " . $e->getMessage();
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Platform Installer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h2>⚙️ Application Setup Wizard</h2>
+                        <p class="mb-0">Configure Database & Super Admin</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <?php if ($error): ?>
+                            <div class="alert alert-danger"><?= $error ?></div>
+                        <?php endif; ?>
+                        <?php if ($success): ?>
+                            <div class="alert alert-success text-center">
+                                <h4><?= $success ?></h4>
+                            </div>
+                        <?php else: ?>
+                            <!-- Compatibility Checks -->
+                            <div class="alert alert-info">
+                                <strong>System Check:</strong><br>
+                                PHP Version: <?= phpversion() ?> <?= version_compare(phpversion(), '8.0', '>=') ? '✅' : '❌' ?><br>
+                                PDO Extension: <?= extension_loaded('pdo') ? '✅' : '❌' ?><br>
+                            </div>
+
+                            <form method="post" action="setup.php">
+                                <h5 class="border-bottom pb-2">1. Database Configuration</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label>Database Host</label>
+                                        <input type="text" name="db_host" class="form-control" value="localhost" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Database Name</label>
+                                        <input type="text" name="db_name" class="form-control" value="expense_tracker" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label>Database User</label>
+                                        <input type="text" name="db_user" class="form-control" value="root" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Database Password</label>
+                                        <input type="password" name="db_pass" class="form-control">
+                                    </div>
+                                </div>
+
+                                <h5 class="border-bottom pb-2">2. Super Admin Details</h5>
+                                <div class="mb-3">
+                                    <label>Admin Full Name</label>
+                                    <input type="text" name="admin_name" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Admin Email</label>
+                                    <input type="email" name="admin_email" class="form-control" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label>Admin Password</label>
+                                    <input type="password" name="admin_pass" class="form-control" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-success btn-lg w-100">Run Setup & Install</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

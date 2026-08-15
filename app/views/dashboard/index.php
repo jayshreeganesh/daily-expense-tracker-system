@@ -3,7 +3,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Dashboard</h2>
-        <a href="<?= URLROOT ?>/transactioncontroller" class="btn btn-primary">+ New Transaction</a>
+        <a href="<?= URLROOT ?>/transaction" class="btn btn-primary">+ New Transaction</a>
     </div>
 
     <!-- Summary Cards -->
@@ -34,11 +34,13 @@
         </div>
     </div>
 
-    <!-- Recent Transactions -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">Recent Transactions</h5>
-        </div>
+    <div class="row">
+        <!-- Recent Transactions -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Transactions</h5>
+                </div>
         <div class="card-body p-0">
             <?php if(empty($data['transactions'])) : ?>
                 <p class="p-4 mb-0 text-center text-muted">No recent transactions found. Start by adding one!</p>
@@ -74,6 +76,54 @@
             <?php endif; ?>
         </div>
     </div>
+        </div>
+
+        <!-- Expense Chart -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Expenses by Category</h5>
+                </div>
+                <div class="card-body">
+                    <?php if(empty($data['chartData'])) : ?>
+                        <p class="text-center text-muted mt-5">No expense data available.</p>
+                    <?php else : ?>
+                        <canvas id="expenseChart"></canvas>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const chartData = <?= json_encode($data['chartData']) ?>;
+        if(chartData && chartData.length > 0) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const labels = chartData.map(item => item.name);
+            const data = chartData.map(item => item.total);
+            const colors = chartData.map(item => item.color_code);
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
 
 <?php require_once APPROOT . '/views/layouts/footer.php'; ?>

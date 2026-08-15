@@ -5,8 +5,14 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Transactions</h2>
-        <div>
-            <a href="<?= URLROOT ?>/transactioncontroller/export" class="btn btn-outline-success me-2">Export CSV</a>
+        <div class="d-flex align-items-center">
+            <form action="<?= URLROOT ?>/transaction/index" method="get" class="d-flex me-3">
+                <input type="month" name="month" class="form-control me-2" value="<?= $data['month'] ?? '' ?>" onchange="this.form.submit()">
+                <?php if(!empty($data['month'])): ?>
+                    <a href="<?= URLROOT ?>/transaction" class="btn btn-outline-secondary">Clear</a>
+                <?php endif; ?>
+            </form>
+            <a href="<?= URLROOT ?>/transaction/export" class="btn btn-outline-success me-2">Export CSV</a>
             <button @click="showModal = true" class="btn btn-primary">+ Add Transaction</button>
         </div>
     </div>
@@ -41,7 +47,7 @@
                                         <?= $tx->type == 'income' ? '+' : '-' ?>$<?= number_format($tx->amount, 2) ?>
                                     </td>
                                     <td>
-                                        <form action="<?= URLROOT; ?>/transactioncontroller/delete/<?= $tx->id ?>" method="post" class="d-inline">
+                                        <form action="<?= URLROOT; ?>/transaction/delete/<?= $tx->id ?>" method="post" class="d-inline">
                                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</button>
                                         </form>
                                     </td>
@@ -51,18 +57,32 @@
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Pagination -->
+            <?php if($data['totalPages'] > 1): ?>
+                <div class="p-3 border-top d-flex justify-content-center">
+                    <ul class="pagination mb-0">
+                        <?php for($i = 1; $i <= $data['totalPages']; $i++): ?>
+                            <li class="page-item <?= $data['page'] == $i ? 'active' : '' ?>">
+                                <a class="page-link" href="<?= URLROOT ?>/transaction/index?page=<?= $i ?><?= !empty($data['month']) ? '&month='.$data['month'] : '' ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+            
         </div>
     </div>
 
     <!-- AlpineJS Modal for Add Transaction -->
-    <div x-show="showModal" style="display: none;" class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div :class="{ 'd-block': showModal }" class="modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title">Add New Transaction</h5>
                     <button type="button" class="btn-close" @click="showModal = false"></button>
                 </div>
-                <form action="<?= URLROOT; ?>/transactioncontroller/add" method="post">
+                <form action="<?= URLROOT; ?>/transaction/add" method="post">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Type</label>
