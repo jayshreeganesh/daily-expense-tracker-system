@@ -79,9 +79,11 @@ class TransactionController extends Controller {
     }
 
     public function export() {
-        $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id']);
+        $month = !empty($_GET['month']) ? $_GET['month'] : null;
+        // Limit high so it essentially gets all for the month
+        $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id'], 10000, 0, $month);
         
-        $filename = "transactions_export_" . date('Y-m-d') . ".csv";
+        $filename = "transactions_export_" . ($month ? $month : date('Y-m-d')) . ".csv";
         
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '";');
@@ -103,5 +105,18 @@ class TransactionController extends Controller {
         
         fclose($output);
         exit;
+    }
+
+    public function exportPdf() {
+        $month = !empty($_GET['month']) ? $_GET['month'] : null;
+        $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id'], 10000, 0, $month);
+        
+        $data = [
+            'transactions' => $transactions,
+            'month' => $month
+        ];
+        
+        // Render a dedicated print-friendly view
+        $this->view('transactions/pdf', $data);
     }
 }

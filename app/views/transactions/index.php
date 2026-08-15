@@ -13,6 +13,7 @@
                 <?php endif; ?>
             </form>
             <a href="<?= URLROOT ?>/transaction/export" class="btn btn-outline-success me-2">Export CSV</a>
+            <a href="<?= URLROOT ?>/transaction/exportPdf<?= !empty($data['month']) ? '?month=' . $data['month'] : '' ?>" class="btn btn-outline-danger me-2">Export PDF</a>
             <button @click="showModal = true" class="btn btn-primary">+ Add Transaction</button>
         </div>
     </div>
