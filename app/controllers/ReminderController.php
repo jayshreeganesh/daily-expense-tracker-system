@@ -26,7 +26,7 @@ class ReminderController extends Controller {
             $data = [
                 'user_id' => $_SESSION['user_id'],
                 'title' => trim($_POST['title']),
-                'description' => trim($_POST['description']),
+                'amount' => trim($_POST['amount']),
                 'due_date' => trim($_POST['due_date'])
             ];
             

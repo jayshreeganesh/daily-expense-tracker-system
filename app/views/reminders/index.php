@@ -12,14 +12,14 @@
         <?php else : ?>
             <?php foreach($data['reminders'] as $reminder) : ?>
                 <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm h-100 <?= $reminder->is_completed ? 'bg-light border-success' : 'border-warning' ?>">
+                    <div class="card shadow-sm h-100 <?= $reminder->status == 'paid' ? 'bg-light border-success' : 'border-warning' ?>">
                         <div class="card-body">
-                            <h5 class="card-title <?= $reminder->is_completed ? 'text-decoration-line-through text-muted' : '' ?>"><?= $reminder->title ?></h5>
+                            <h5 class="card-title <?= $reminder->status == 'paid' ? 'text-decoration-line-through text-muted' : '' ?>"><?= htmlspecialchars($reminder->title) ?></h5>
                             <h6 class="card-subtitle mb-2 text-muted">Due: <?= date('M d, Y', strtotime($reminder->due_date)) ?></h6>
-                            <p class="card-text small"><?= $reminder->description ?></p>
+                            <p class="card-text fw-bold text-danger">Amount: $<?= number_format($reminder->amount, 2) ?></p>
                         </div>
                         <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
-                            <?php if(!$reminder->is_completed): ?>
+                            <?php if($reminder->status == 'pending'): ?>
                                 <a href="<?= URLROOT ?>/reminder/complete/<?= $reminder->id ?>" class="btn btn-sm btn-outline-success">✔ Mark Paid</a>
                             <?php else: ?>
                                 <span class="badge bg-success">Completed</span>
@@ -54,8 +54,8 @@
                             <input type="date" name="due_date" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Description (Optional)</label>
-                            <textarea name="description" class="form-control" rows="2"></textarea>
+                            <label class="form-label">Amount</label>
+                            <input type="number" step="0.01" name="amount" class="form-control" required placeholder="0.00">
                         </div>
                     </div>
                     <div class="modal-footer">
