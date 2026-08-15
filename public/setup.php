@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $site_name = trim($_POST['site_name']);
     $currency = trim($_POST['currency']);
     $timezone = trim($_POST['timezone']);
+    $brand_color = trim($_POST['brand_color']);
     
     try {
         // Step 1: Securely Connect to MySQL
@@ -65,6 +66,7 @@ define('APPROOT', dirname(dirname(__FILE__)));
 define('SITENAME', '" . addslashes($site_name) . "');
 define('CURRENCY_SYMBOL', '" . addslashes($currency) . "');
 define('TIMEZONE', '" . addslashes($timezone) . "');
+define('BRAND_COLOR', '" . addslashes($brand_color) . "');
 date_default_timezone_set(TIMEZONE);
 
 // Dynamically determine the URLROOT based on the current server host
@@ -218,6 +220,10 @@ define('URLROOT', \$protocol . \$_SERVER['HTTP_HOST']);
                                             <option value="Australia/Sydney">Australia/Sydney</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Brand Color</label>
+                                    <input type="color" name="brand_color" class="form-control form-control-color w-100" value="#0d6efd" required>
                                 </div>
                             </div>
 

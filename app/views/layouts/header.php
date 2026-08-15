@@ -11,6 +11,21 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="<?= URLROOT ?>/public/css/style.css">
+    <?php if(defined('BRAND_COLOR')): ?>
+    <style>
+        :root {
+            --bs-primary: <?= BRAND_COLOR ?>;
+            --bs-primary-rgb: <?php 
+                list($r, $g, $b) = sscanf(BRAND_COLOR, "#%02x%02x%02x");
+                echo "$r, $g, $b"; 
+            ?>;
+        }
+        .bg-primary { background-color: var(--bs-primary) !important; }
+        .text-primary { color: var(--bs-primary) !important; }
+        .btn-primary { background-color: var(--bs-primary); border-color: var(--bs-primary); }
+        .btn-primary:hover { filter: brightness(85%); }
+    </style>
+    <?php endif; ?>
 </head>
 <body class="bg-light">
     <!-- Navbar -->

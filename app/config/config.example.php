@@ -20,3 +20,6 @@ define('CURRENCY_SYMBOL', '$');
 // Timezone
 define('TIMEZONE', 'UTC');
 date_default_timezone_set(TIMEZONE);
+
+// Brand Color
+define('BRAND_COLOR', '#0d6efd');
