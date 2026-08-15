@@ -11,19 +11,72 @@ class AuthController extends Controller {
             header('Location: ' . URLROOT . '/dashboard');
             exit;
         } else {
-            $this->view('auth/login');
+            $this->view('auth/index');
         }
     }
 
-    public function register() {
-        // Check if logged in
+    public function adminLogin() {
         if (isLoggedIn()) {
             header('Location: ' . URLROOT . '/dashboard');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Process form
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'email' => trim($_POST['email']),
+                'password' => trim($_POST['password']),
+                'email_err' => '',
+                'password_err' => ''
+            ];
+
+            if (empty($data['email'])) {
+                $data['email_err'] = 'Please enter email';
+            }
+            if (empty($data['password'])) {
+                $data['password_err'] = 'Please enter password';
+            }
+
+            if (!$this->userModel->findUserByEmail($data['email'])) {
+                $data['email_err'] = 'No user found';
+            }
+
+            if (empty($data['email_err']) && empty($data['password_err'])) {
+                $loggedInUser = $this->userModel->login($data['email'], $data['password']);
+
+                if ($loggedInUser) {
+                    if (in_array($loggedInUser->role, ['admin', 'recruiter'])) {
+                        $this->createUserSession($loggedInUser);
+                    } else {
+                        $data['password_err'] = 'Access Denied. You are not an Admin.';
+                        $this->view('auth/admin_login', $data);
+                    }
+                } else {
+                    $data['password_err'] = 'Password incorrect';
+                    $this->view('auth/admin_login', $data);
+                }
+            } else {
+                $this->view('auth/admin_login', $data);
+            }
+        } else {
+            $data = [
+                'email' => '',
+                'password' => '',
+                'email_err' => '',
+                'password_err' => ''
+            ];
+            $this->view('auth/admin_login', $data);
+        }
+    }
+
+    public function register() {
+        if (isLoggedIn()) {
+            header('Location: ' . URLROOT . '/dashboard');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
             $data = [
@@ -37,14 +90,12 @@ class AuthController extends Controller {
                 'confirm_password_err' => ''
             ];
 
-            // Validate
             if (empty($data['name'])) {
                 $data['name_err'] = 'Please enter name';
             }
             if (empty($data['email'])) {
                 $data['email_err'] = 'Please enter email';
             } else {
-                // Check email
                 if ($this->userModel->findUserByEmail($data['email'])) {
                     $data['email_err'] = 'Email is already taken';
                 }
@@ -62,12 +113,8 @@ class AuthController extends Controller {
                 }
             }
 
-            // Make sure errors are empty
             if (empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])) {
-                // Hash Password
                 $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-
-                // Register User
                 if ($this->userModel->register($data)) {
                     flash('register_success', 'You are registered and can log in');
                     header('Location: ' . URLROOT . '/auth/login');
@@ -76,12 +123,9 @@ class AuthController extends Controller {
                     die('Something went wrong');
                 }
             } else {
-                // Load view with errors
                 $this->view('auth/register', $data);
             }
-
         } else {
-            // Init data
             $data = [
                 'name' => '',
                 'email' => '',
@@ -97,14 +141,12 @@ class AuthController extends Controller {
     }
 
     public function login() {
-        // Check if logged in
         if (isLoggedIn()) {
             header('Location: ' . URLROOT . '/dashboard');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Process form
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
             $data = [
@@ -121,10 +163,7 @@ class AuthController extends Controller {
                 $data['password_err'] = 'Please enter password';
             }
 
-            // Check for user/email
-            if ($this->userModel->findUserByEmail($data['email'])) {
-                // User found
-            } else {
+            if (!$this->userModel->findUserByEmail($data['email'])) {
                 $data['email_err'] = 'No user found';
             }
 
@@ -132,7 +171,6 @@ class AuthController extends Controller {
                 $loggedInUser = $this->userModel->login($data['email'], $data['password']);
 
                 if ($loggedInUser) {
-                    // Create Session
                     $this->createUserSession($loggedInUser);
                 } else {
                     $data['password_err'] = 'Password incorrect';
@@ -141,7 +179,6 @@ class AuthController extends Controller {
             } else {
                 $this->view('auth/login', $data);
             }
-
         } else {
             $data = [
                 'email' => '',
@@ -157,6 +194,7 @@ class AuthController extends Controller {
         $_SESSION['user_id'] = $user->id;
         $_SESSION['user_email'] = $user->email;
         $_SESSION['user_name'] = $user->name;
+        $_SESSION['user_role'] = $user->role;
         header('Location: ' . URLROOT . '/dashboard');
         exit;
     }
@@ -165,8 +203,9 @@ class AuthController extends Controller {
         unset($_SESSION['user_id']);
         unset($_SESSION['user_email']);
         unset($_SESSION['user_name']);
+        unset($_SESSION['user_role']);
         session_destroy();
-        header('Location: ' . URLROOT . '/auth/login');
+        header('Location: ' . URLROOT . '/auth');
         exit;
     }
 }

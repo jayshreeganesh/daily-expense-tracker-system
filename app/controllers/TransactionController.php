@@ -13,11 +13,23 @@ class TransactionController extends Controller {
     }
 
     public function index() {
-        $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id']);
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $month = !empty($_GET['month']) ? $_GET['month'] : null;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+
+        $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id'], $limit, $offset, $month);
+        $total = $this->transactionModel->getTotalTransactionsByUser($_SESSION['user_id'], $month);
+        $totalPages = ceil($total / $limit);
+
         $categories = $this->categoryModel->getCategoriesByUser($_SESSION['user_id']);
+        
         $data = [
             'transactions' => $transactions,
-            'categories' => $categories
+            'categories' => $categories,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'month' => $month
         ];
         $this->view('transactions/index', $data);
     }
@@ -38,14 +50,14 @@ class TransactionController extends Controller {
             if (!empty($data['category_id']) && !empty($data['amount']) && !empty($data['transaction_date'])) {
                 if ($this->transactionModel->addTransaction($data)) {
                     flash('transaction_message', 'Transaction Added Successfully');
-                    header('Location: ' . URLROOT . '/transactioncontroller');
+                    header('Location: ' . URLROOT . '/transaction');
                     exit;
                 } else {
                     die('Something went wrong');
                 }
             } else {
                 flash('transaction_message', 'Please fill all required fields', 'alert alert-danger');
-                header('Location: ' . URLROOT . '/transactioncontroller');
+                header('Location: ' . URLROOT . '/transaction');
                 exit;
             }
         }
@@ -55,13 +67,13 @@ class TransactionController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($this->transactionModel->deleteTransaction($id, $_SESSION['user_id'])) {
                 flash('transaction_message', 'Transaction Removed');
-                header('Location: ' . URLROOT . '/transactioncontroller');
+                header('Location: ' . URLROOT . '/transaction');
                 exit;
             } else {
                 die('Something went wrong');
             }
         } else {
-            header('Location: ' . URLROOT . '/transactioncontroller');
+            header('Location: ' . URLROOT . '/transaction');
             exit;
         }
     }

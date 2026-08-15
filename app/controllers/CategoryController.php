@@ -32,18 +32,18 @@ class CategoryController extends Controller {
             if (!empty($data['name']) && !empty($data['type'])) {
                 if ($this->categoryModel->addCategory($data)) {
                     flash('category_message', 'Category Added');
-                    header('Location: ' . URLROOT . '/categorycontroller');
+                    header('Location: ' . URLROOT . '/category');
                     exit;
                 } else {
                     die('Something went wrong');
                 }
             } else {
                 flash('category_message', 'Please fill in all fields', 'alert alert-danger');
-                header('Location: ' . URLROOT . '/categorycontroller');
+                header('Location: ' . URLROOT . '/category');
                 exit;
             }
         } else {
-            header('Location: ' . URLROOT . '/categorycontroller');
+            header('Location: ' . URLROOT . '/category');
             exit;
         }
     }

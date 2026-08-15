@@ -29,3 +29,28 @@ function isLoggedIn() {
         return false;
     }
 }
+
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verify_csrf_token($token) {
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
+        return true;
+    }
+    return false;
+}
+
+function log_audit($user_id, $action, $entity_type, $entity_id = null, $details = null) {
+    $db = new Database();
+    $db->query('INSERT INTO audit_logs (user_id, action, entity_type, entity_id, details) VALUES (:user_id, :action, :entity_type, :entity_id, :details)');
+    $db->bind(':user_id', $user_id);
+    $db->bind(':action', $action);
+    $db->bind(':entity_type', $entity_type);
+    $db->bind(':entity_id', $entity_id);
+    $db->bind(':details', $details);
+    $db->execute();
+}
