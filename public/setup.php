@@ -172,7 +172,6 @@ define('SITENAME', 'Daily Expense Tracker');
                                     <label>Super Admin Password</label>
                                     <input type="password" name="admin_pass" class="form-control" required minlength="6" placeholder="Choose a strong password">
                                 </div>
-                            </div>
                             
                             <!-- Step 3: Application Settings -->
                             <div class="mb-4">
