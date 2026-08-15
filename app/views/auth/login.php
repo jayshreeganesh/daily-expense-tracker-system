@@ -24,6 +24,9 @@
                         <a href="<?= URLROOT; ?>/auth/register" class="btn btn-light w-100">No account? Register</a>
                     </div>
                 </div>
+                <div class="mt-3 text-center">
+                    <a href="<?= URLROOT; ?>/auth/forgotPassword" class="text-decoration-none">Forgot Password?</a>
+                </div>
             </form>
             <div class="text-center mt-4">
                 <a href="<?= URLROOT ?>/auth" class="text-decoration-none text-muted">← Back to Portal Selection</a>

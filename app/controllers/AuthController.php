@@ -208,4 +208,81 @@ class AuthController extends Controller {
         header('Location: ' . URLROOT . '/auth');
         exit;
     }
+
+    public function forgotPassword() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $email = trim($_POST['email']);
+            
+            if (empty($email)) {
+                $data = ['email_err' => 'Please enter email', 'email' => ''];
+                $this->view('auth/forgot_password', $data);
+                return;
+            }
+
+            if ($this->userModel->findUserByEmail($email)) {
+                $token = bin2hex(random_bytes(32));
+                $this->userModel->setResetToken($email, $token);
+                // In a real app, send email here. For demo, we just show the link.
+                $resetLink = URLROOT . '/auth/resetPassword?email=' . urlencode($email) . '&token=' . $token;
+                flash('reset_message', 'Reset link generated: <a href="'.$resetLink.'">Click here to reset password</a>', 'alert alert-info');
+            } else {
+                flash('reset_message', 'No account found with that email.', 'alert alert-danger');
+            }
+            header('Location: ' . URLROOT . '/auth/forgotPassword');
+            exit;
+        } else {
+            $data = ['email' => '', 'email_err' => ''];
+            $this->view('auth/forgot_password', $data);
+        }
+    }
+
+    public function resetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $email = trim($_POST['email']);
+            $token = trim($_POST['token']);
+            $password = trim($_POST['password']);
+            $confirm = trim($_POST['confirm_password']);
+
+            $data = [
+                'email' => $email,
+                'token' => $token,
+                'password_err' => '',
+                'confirm_err' => ''
+            ];
+
+            if (empty($password) || strlen($password) < 6) {
+                $data['password_err'] = 'Password must be at least 6 characters';
+            }
+            if ($password != $confirm) {
+                $data['confirm_err'] = 'Passwords do not match';
+            }
+
+            if (empty($data['password_err']) && empty($data['confirm_err'])) {
+                $user = $this->userModel->getUserByToken($email, $token);
+                if ($user) {
+                    $this->userModel->updatePassword($user->id, $password);
+                    flash('register_success', 'Password updated! You can now log in.');
+                    header('Location: ' . URLROOT . '/auth/login');
+                    exit;
+                } else {
+                    die('Invalid or expired token.');
+                }
+            } else {
+                $this->view('auth/reset_password', $data);
+            }
+        } else {
+            if(!isset($_GET['email']) || !isset($_GET['token'])) {
+                die('Invalid request');
+            }
+            $data = [
+                'email' => $_GET['email'],
+                'token' => $_GET['token'],
+                'password_err' => '',
+                'confirm_err' => ''
+            ];
+            $this->view('auth/reset_password', $data);
+        }
+    }
 }
