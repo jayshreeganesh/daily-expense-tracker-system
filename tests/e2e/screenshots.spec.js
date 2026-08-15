@@ -1,9 +1,11 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
+const path = require('path');
 
 (async () => {
-    if (!fs.existsSync('portfolio_media')) {
-        fs.mkdirSync('portfolio_media');
+    const baseDir = 'screenshots';
+    if (!fs.existsSync(baseDir)) {
+        fs.mkdirSync(baseDir);
     }
 
     const browser = await chromium.launch();
@@ -34,6 +36,11 @@ const fs = require('fs');
     ];
 
     for (const vp of viewports) {
+        const deviceDir = path.join(baseDir, vp.name);
+        if (!fs.existsSync(deviceDir)) {
+            fs.mkdirSync(deviceDir);
+        }
+
         await page.setViewportSize({ width: vp.width, height: vp.height });
         console.log(`Setting viewport to ${vp.name}...`);
 
@@ -42,7 +49,7 @@ const fs = require('fs');
             await page.goto(pg.url, { waitUntil: 'networkidle' });
             await page.waitForTimeout(1000); 
 
-            const screenshotPath = `portfolio_media/${vp.name}_${pg.name}.png`;
+            const screenshotPath = path.join(deviceDir, `${pg.name}.png`);
             await page.screenshot({ path: screenshotPath, fullPage: true });
             console.log(`Saved screenshot: ${screenshotPath}`);
         }
@@ -52,12 +59,21 @@ const fs = require('fs');
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('http://localhost:8080/dashboard', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000); 
+    
+    // Force CSS media type to 'screen' to prevent Bootstrap from applying print stylesheets
+    // which normally strip colors, borders, and mess up charts.
+    await page.emulateMedia({ media: 'screen' });
+    
+    // Inject a style to prevent page breaks inside cards
+    await page.addStyleTag({ content: '.card { page-break-inside: avoid; }' });
+
     await page.pdf({ 
-        path: 'portfolio_media/ExpenseTracker_Portfolio_Doc.pdf', 
-        format: 'A4', 
-        printBackground: true 
+        path: path.join(baseDir, 'ExpenseTracker_Portfolio_Doc.pdf'), 
+        format: 'A3', // Using A3 for wider layout to fit desktop better
+        printBackground: true,
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
     });
-    console.log('Saved PDF: portfolio_media/ExpenseTracker_Portfolio_Doc.pdf');
+    console.log(`Saved PDF: ${path.join(baseDir, 'ExpenseTracker_Portfolio_Doc.pdf')}`);
 
     await browser.close();
     console.log('All screenshots and PDFs generated successfully!');
