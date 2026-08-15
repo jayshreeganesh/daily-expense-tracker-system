@@ -6,19 +6,47 @@ class Transaction {
         $this->db = new Database;
     }
 
-    public function getTransactionsByUser($user_id, $limit = null) {
+    public function getTransactionsByUser($user_id, $limit = null, $offset = 0, $month = null) {
         $sql = 'SELECT t.*, c.name as category_name, c.color_code 
                 FROM transactions t 
                 LEFT JOIN categories c ON t.category_id = c.id 
-                WHERE t.user_id = :user_id 
-                ORDER BY t.transaction_date DESC, t.created_at DESC';
-        if ($limit) {
-            $sql .= ' LIMIT ' . $limit;
+                WHERE t.user_id = :user_id';
+
+        if ($month) {
+            $sql .= ' AND DATE_FORMAT(t.transaction_date, "%Y-%m") = :month';
+        }
+
+        $sql .= ' ORDER BY t.transaction_date DESC, t.created_at DESC';
+
+        if ($limit !== null) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
         }
         
         $this->db->query($sql);
         $this->db->bind(':user_id', $user_id);
+
+        if ($month) {
+            $this->db->bind(':month', $month);
+        }
+        if ($limit !== null) {
+            $this->db->bind(':limit', (int)$limit, PDO::PARAM_INT);
+            $this->db->bind(':offset', (int)$offset, PDO::PARAM_INT);
+        }
+
         return $this->db->resultSet();
+    }
+
+    public function getTotalTransactionsByUser($user_id, $month = null) {
+        $sql = 'SELECT COUNT(*) as total FROM transactions WHERE user_id = :user_id';
+        if ($month) {
+            $sql .= ' AND DATE_FORMAT(transaction_date, "%Y-%m") = :month';
+        }
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $user_id);
+        if ($month) {
+            $this->db->bind(':month', $month);
+        }
+        return $this->db->single()->total;
     }
 
     public function getSummaryByUser($user_id) {
@@ -38,6 +66,12 @@ class Transaction {
         return $summary;
     }
 
+    public function getExpensesByCategory($user_id) {
+        $this->db->query('SELECT c.name, c.color_code, SUM(t.amount) as total FROM transactions t JOIN categories c ON t.category_id = c.id WHERE t.user_id = :user_id AND t.type = "expense" GROUP BY c.id');
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->resultSet();
+    }
+
     public function addTransaction($data) {
         $this->db->query('INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (:user_id, :category_id, :amount, :type, :transaction_date, :description)');
         $this->db->bind(':user_id', $data['user_id']);
@@ -48,10 +82,11 @@ class Transaction {
         $this->db->bind(':description', $data['description']);
 
         if ($this->db->execute()) {
+            $id = $this->db->lastInsertId();
+            log_audit($data['user_id'], 'Created Transaction', 'Transaction', $id, 'Amount: ' . $data['amount']);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function deleteTransaction($id, $user_id) {
@@ -60,9 +95,9 @@ class Transaction {
         $this->db->bind(':user_id', $user_id);
 
         if ($this->db->execute()) {
+            log_audit($user_id, 'Deleted Transaction', 'Transaction', $id);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

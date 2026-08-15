@@ -1,0 +1,22 @@
+{
+  "directories": [
+    "/.git/",
+    "/node_modules/",
+    "/tests/",
+    "/screenshots/",
+    "/test-results/",
+    "/playwright-report/"
+  ],
+  "files": [
+    "package.json",
+    "package-lock.json",
+    "playwright.config.js",
+    ".gitignore",
+    "setup.php",
+    "demo_data.json",
+    "zip_exclusions.json",
+    "database.sql",
+    "setup.lock",
+    "config.php"
+  ]
+}
