@@ -120,16 +120,21 @@ class Admin {
     }
 
     public function seedDemoData() {
-        $email = 'demo_user_' . time() . '@example.com';
-        $this->createUser('Demo Seeded User', $email, 'password123', 'user');
+        $user_id = $_SESSION['user_id'];
         
-        $this->db->query('SELECT id FROM users WHERE email = :email');
-        $this->db->bind(':email', $email);
-        $user_id = $this->db->single()->id;
+        // Reset existing data for this user
+        $this->db->query('DELETE FROM categories WHERE user_id = :uid');
+        $this->db->bind(':uid', $user_id);
+        $this->db->execute(); // This will cascade delete transactions
+        
+        $this->db->query('DELETE FROM reminders WHERE user_id = :uid');
+        $this->db->bind(':uid', $user_id);
+        $this->db->execute();
 
         $jsonData = json_decode(file_get_contents(APPROOT . '/config/demo_data.json'), true);
         $categories = $jsonData['categories'] ?? [];
         $transactions = $jsonData['transactions'] ?? [];
+        $reminders = $jsonData['reminders'] ?? [];
         
         $catIds = [];
         foreach($categories as $cat) {
@@ -155,7 +160,16 @@ class Admin {
             }
         }
         
-        log_audit($_SESSION['user_id'], 'Seeded Demo Data', 'System', null, "Created $email and dummy data from JSON");
+        foreach($reminders as $rem) {
+            $this->db->query('INSERT INTO reminders (user_id, title, amount, due_date) VALUES (:uid, :title, :amount, :due_date)');
+            $this->db->bind(':uid', $user_id);
+            $this->db->bind(':title', $rem['title']);
+            $this->db->bind(':amount', $rem['amount']);
+            $this->db->bind(':due_date', date('Y-m-d', strtotime('+' . $rem['due_date_offset'] . ' days')));
+            $this->db->execute();
+        }
+        
+        log_audit($_SESSION['user_id'], 'Reset & Seeded Demo Data', 'System', null, "Cleared existing data and applied JSON seed");
         return true;
     }
 }
