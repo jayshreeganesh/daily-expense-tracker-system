@@ -1,71 +1,42 @@
-# Daily Expense Tracker Pro (PHP MVC)
+# 💰 Daily Expense Tracker Pro (SaaS Edition)
 
-A professional, responsive, and dynamic Expense Tracker built from scratch using a Custom PHP MVC framework, MySQL, Bootstrap 5, and Alpine.js. This MVP is designed to be highly presentable for a portfolio, showcasing a deep understanding of core programming concepts, design patterns, and modern frontend interactivity.
+[![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://mysql.com)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-Reactive-8BC0D0?style=flat-square&logo=alpine.js&logoColor=white)](https://alpinejs.dev)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=flat-square&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
 
-## 🌟 Key Features
+A fully-featured, multi-tenant capable SaaS Expense Tracker engineered entirely from scratch. Built using a Custom PHP 8 MVC framework, this platform prioritizes zero-dependency architecture, iron-clad PDO security, and dynamic white-label configuration.
 
-1. **Custom MVC Architecture**: Hand-coded Model-View-Controller framework without relying on heavy libraries like Laravel or CodeIgniter.
-2. **User Authentication**: Secure login and registration with password hashing (Bcrypt) and session management.
-## 🚀 Core Features
-- **User Authentication**: Secure registration and login using PHP `password_hash` and `password_verify`.
-- **Expense & Income Tracking**: Easily record transactions, categorize them, and specify the date and amount.
-- **Dynamic Dashboard**: Visualize your financial flow with interactive **Chart.js** graphs.
-- **Pagination & Filtering**: Efficiently browse transaction history with date filters and pagination.
-- **Bill Reminders**: Set upcoming bill reminders, track due dates, and mark them as paid.
-- **Export Data**: Download your transaction history instantly as a `.csv` file.
+---
 
-## 👑 Enterprise SaaS Features (Super Admin Panel)
-- **Role-Based Access Control (RBAC)**: Supports `User`, `Recruiter` (Read-Only Admin), and `Super Admin` roles.
-- **Audit Logging System**: The backend silently tracks and logs all critical database interactions for accountability.
-- **Bulk CSV Importing**: Admins can download a CSV template and upload it to bulk-insert transactions.
-- **System Operations Engine**: 
-  - One-click MySQL Database Backup `.sql` downloads.
-  - One-click UI button to Seed Demo Data for testing.
-  - One-click UI button to export the entire project source code into a clean `.zip`.
+### 🌐 Live Demo
+Experience the platform live: **[Launch Live Demo](https://daily-expense-tracker-system.iceiy.com/)**
+
+**Demo Accounts (Auto-seeded & sandboxed):**
+- **Admin Portal:** `demoadmin@example.com` / `demoadmin123`
+- **Standard User:** `demouser@example.com` / `demouser123`
+
+---
+
+## ✨ Core Engineering Features
+
+- **🚀 Zero-Config Installer:** Bypasses manual `.sql` imports or `.env` configurations. Simply run `public/setup.php` to dynamically generate routing configurations, define the database schema, and seed demo accounts regardless of strict shared-hosting constraints.
+- **🎨 White-Label Branding Engine:** The installer seamlessly injects global CSS variables into the DOM to completely override Bootstrap themes based on a selected brand color. Timezones and currency symbols (`$`, `€`, `₹`) globally synchronize across all views.
+- **📊 Premium Reporting Engine:** Instead of heavy backend libraries, the platform utilizes advanced `@media print` CSS directives and browser-native capabilities to generate pixel-perfect, invoice-style **PDF Reports** and fast **CSV Exports**.
+- **🛡️ Custom MVC & Security:** Operates on a bespoke Model-View-Controller framework. Features strict Role-Based Access Control (RBAC), immutable Audit Logs, Bcrypt password hashing, and total SQL Injection prevention via strict PDO Prepared Statements.
 
 ## 🛠️ Technology Stack
-- **Backend**: PHP 8.x (Custom MVC Architecture)
-- **Database**: MySQL (PDO Wrapper)
-- **Frontend**: HTML5, CSS3, Bootstrap 5, Alpine.js
-- **Visuals**: Chart.js
-- **Security**: CSRF Protection Tokens, Prepared Statements (SQLi prevention), XSS sanitization.
+- **Backend Architecture:** Core PHP 8 (Custom MVC, Zero Composer Dependencies)
+- **Database:** MySQL / MariaDB (Relational Architecture)
+- **Frontend Interactivity:** Alpine.js (Reactive states)
+- **UI Framework:** Bootstrap 5 (Responsive layouts)
+- **Data Visualization:** Chart.js
 
-## 📥 Installation & Setup
-1. **Clone the repository:**
-   ```bash
-   git clone <your-repo-url>
-   ```
-2. **Database Setup:**
-   - Create a MySQL database named `expense_tracker`.
-   - Run the provided `.sql` migrations or trigger the seeding script.
-3. **Configure the App:**
-   - Open `app/config/config.php` and update `DB_USER` and `DB_PASS` to match your local environment.
-   - Ensure `URLROOT` is set correctly (e.g., `http://localhost:8080`).
-4. **Run the Server:**
-   ```bash
-   php -S localhost:8080 -t public
-   ```
+## 🚀 Quick Start (Installation)
+1. **Upload** the repository to your web server (e.g., Apache `public_html` or XAMPP `htdocs`).
+2. **Navigate** your browser to the wizard: `http://yourdomain.com/public/setup.php`
+3. **Configure** your database credentials, SaaS Brand Color, and Default Categories via the UI.
+4. **Click Install** — The system will automatically build your configuration file, seed the database, lock the installer, and redirect you to your newly deployed SaaS platform!
 
-## 🔒 Demo Credentials
-- **Super Admin**: `admin@example.com` / `admin123`
-- **Recruiter Demo**: `demo_admin@example.com` / `demoadmin123`
-- **Standard User**: `user@example.com` / `user123`
-
-### Starting the Server
-
-**Option A: PHP Built-in Server (Recommended for quick testing)**
-Run the included router script from the root of the project:
-```bash
-php -S localhost:8080 server.php
-```
-Then navigate to `http://localhost:8080` in your browser.
-
-**Option B: Apache (XAMPP/WAMP)**
-Place the project folder in your `htdocs` or `www` directory. Start the Apache and MySQL services, then navigate to `http://localhost/daily-expense-tracker-system/`. The included `.htaccess` files will automatically route traffic.
-
-## 📁 Folder Structure
-
-- `app/` - Contains all core MVC files (Controllers, Models, Views, config, helpers).
-- `public/` - The document root containing `index.php` (Front Controller), CSS, JS, and assets.
-- `database.sql` - The database schema for easy setup.
-- `server.php` - Custom router for the PHP built-in server.
+## 📚 Technical Documentation
+To dive deep into the architectural choices, security model, and database schema, please visit the official [Project Wiki](https://github.com/jayshreeganesh/daily-expense-tracker-system/wiki).
