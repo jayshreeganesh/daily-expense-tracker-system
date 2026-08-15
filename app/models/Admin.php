@@ -122,7 +122,7 @@ class Admin {
     public function seedDemoData() {
         $user_id = $_SESSION['user_id'];
         
-        // Reset existing data for this user
+        // 1. Reset existing data for the current user
         $this->db->query('DELETE FROM categories WHERE user_id = :uid');
         $this->db->bind(':uid', $user_id);
         $this->db->execute(); // This will cascade delete transactions
@@ -131,42 +131,71 @@ class Admin {
         $this->db->bind(':uid', $user_id);
         $this->db->execute();
 
+        // 2. Ensure the Portfolio 'Demo Admin' user exists for recruiters
+        $this->db->query('SELECT id FROM users WHERE email = :email');
+        $this->db->bind(':email', 'admin@example.com');
+        $demoAdmin = $this->db->single();
+        
+        if (!$demoAdmin) {
+            $this->db->query('INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)');
+            $this->db->bind(':name', 'Demo Admin');
+            $this->db->bind(':email', 'admin@example.com');
+            $this->db->bind(':password', password_hash('password123', PASSWORD_DEFAULT));
+            $this->db->bind(':role', 'admin');
+            $this->db->execute();
+            $demoAdminId = $this->db->lastInsertId();
+        } else {
+            $demoAdminId = $demoAdmin->id;
+            // Clear demo admin data so it gets fresh seed data
+            $this->db->query('DELETE FROM categories WHERE user_id = :uid');
+            $this->db->bind(':uid', $demoAdminId);
+            $this->db->execute();
+            $this->db->query('DELETE FROM reminders WHERE user_id = :uid');
+            $this->db->bind(':uid', $demoAdminId);
+            $this->db->execute();
+        }
+
+        // We will seed data for BOTH the current user AND the demo admin
+        $targetUsers = array_unique([$user_id, $demoAdminId]);
+
         $jsonData = json_decode(file_get_contents(APPROOT . '/config/demo_data.json'), true);
         $categories = $jsonData['categories'] ?? [];
         $transactions = $jsonData['transactions'] ?? [];
         $reminders = $jsonData['reminders'] ?? [];
         
-        $catIds = [];
-        foreach($categories as $cat) {
-            $this->db->query('INSERT INTO categories (user_id, name, type, color_code) VALUES (:uid, :name, :type, :color)');
-            $this->db->bind(':uid', $user_id);
-            $this->db->bind(':name', $cat['name']);
-            $this->db->bind(':type', $cat['type']);
-            $this->db->bind(':color', $cat['color_code']);
-            $this->db->execute();
-            $catIds[] = $this->db->lastInsertId();
-        }
+        foreach($targetUsers as $targetUserId) {
+            $catIds = [];
+            foreach($categories as $cat) {
+                $this->db->query('INSERT INTO categories (user_id, name, type, color_code) VALUES (:uid, :name, :type, :color)');
+                $this->db->bind(':uid', $targetUserId);
+                $this->db->bind(':name', $cat['name']);
+                $this->db->bind(':type', $cat['type']);
+                $this->db->bind(':color', $cat['color_code']);
+                $this->db->execute();
+                $catIds[] = $this->db->lastInsertId();
+            }
 
-        foreach($transactions as $txn) {
-            if(isset($catIds[$txn['category_index']])) {
-                $this->db->query('INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (:uid, :cid, :amt, :type, :dt, :desc)');
-                $this->db->bind(':uid', $user_id);
-                $this->db->bind(':cid', $catIds[$txn['category_index']]);
-                $this->db->bind(':amt', $txn['amount']);
-                $this->db->bind(':type', $txn['type']);
-                $this->db->bind(':dt', date('Y-m-d'));
-                $this->db->bind(':desc', $txn['description']);
+            foreach($transactions as $txn) {
+                if(isset($catIds[$txn['category_index']])) {
+                    $this->db->query('INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (:uid, :cid, :amt, :type, :dt, :desc)');
+                    $this->db->bind(':uid', $targetUserId);
+                    $this->db->bind(':cid', $catIds[$txn['category_index']]);
+                    $this->db->bind(':amt', $txn['amount']);
+                    $this->db->bind(':type', $txn['type']);
+                    $this->db->bind(':dt', date('Y-m-d'));
+                    $this->db->bind(':desc', $txn['description']);
+                    $this->db->execute();
+                }
+            }
+            
+            foreach($reminders as $rem) {
+                $this->db->query('INSERT INTO reminders (user_id, title, amount, due_date) VALUES (:uid, :title, :amount, :due_date)');
+                $this->db->bind(':uid', $targetUserId);
+                $this->db->bind(':title', $rem['title']);
+                $this->db->bind(':amount', $rem['amount']);
+                $this->db->bind(':due_date', date('Y-m-d', strtotime('+' . $rem['due_date_offset'] . ' days')));
                 $this->db->execute();
             }
-        }
-        
-        foreach($reminders as $rem) {
-            $this->db->query('INSERT INTO reminders (user_id, title, amount, due_date) VALUES (:uid, :title, :amount, :due_date)');
-            $this->db->bind(':uid', $user_id);
-            $this->db->bind(':title', $rem['title']);
-            $this->db->bind(':amount', $rem['amount']);
-            $this->db->bind(':due_date', date('Y-m-d', strtotime('+' . $rem['due_date_offset'] . ' days')));
-            $this->db->execute();
         }
         
         log_audit($_SESSION['user_id'], 'Reset & Seeded Demo Data', 'System', null, "Cleared existing data and applied JSON seed");
