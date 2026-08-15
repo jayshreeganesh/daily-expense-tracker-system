@@ -1,23 +1,33 @@
 const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   fullyParallel: true,
-  reporter: 'list',
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
   use: {
-    // Base URL where the PHP Built-in Server runs
     baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
-  // Configure testing matrices for 3 different viewports
   projects: [
     {
-      name: 'Desktop Chrome',
+      name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
     {
-      name: 'Tablet iPad',
-      use: { ...devices['iPad Pro 11'] },
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
     },
     {
       name: 'Mobile Safari',
