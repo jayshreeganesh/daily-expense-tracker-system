@@ -33,6 +33,13 @@ jobs:
         with:
           php-version: '8.2'
           extensions: pdo, pdo_mysql, mbstring
+          tools: composer
+
+      - name: Install Composer Dependencies (PHPUnit)
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run PHPUnit Backend Tests
+        run: vendor/bin/phpunit --configuration phpunit.xml
 
       - name: Start PHP Built-in Server
         run: |

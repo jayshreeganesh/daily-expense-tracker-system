@@ -1,0 +1,15 @@
+{
+    "name": "jayshreeganesh/daily-expense-tracker-system",
+    "description": "Daily Expense Tracker SaaS",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "classmap": [
+            "app/libraries",
+            "app/models",
+            "app/helpers"
+        ]
+    }
+}
