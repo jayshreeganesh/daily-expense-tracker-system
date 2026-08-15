@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 
 test('capture screenshots of the application', async ({ page }) => {
+  test.setTimeout(120000); // 120 seconds to prevent timeout during multi-device testing
   // Ensure screenshots directory exists
   if (!fs.existsSync('screenshots')) {
     fs.mkdirSync('screenshots');

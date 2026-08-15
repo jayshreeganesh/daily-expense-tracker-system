@@ -89,11 +89,11 @@ jobs:
         run: |
           npm init -y
           npm install -D @playwright/test
-          npx playwright install chromium --with-deps
+          npx playwright install --with-deps
 
       - name: Run Playwright E2E UI Tests & Capture Screenshots
         run: |
-          npx playwright test tests/e2e/screenshot.spec.js --project=chromium
+          npx playwright test tests/e2e/screenshot.spec.js
 
       - name: Upload Screenshots as Workflow Artifacts
         uses: actions/upload-artifact@v4
