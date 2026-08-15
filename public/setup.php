@@ -169,16 +169,16 @@ define('SITENAME', 'Daily Expense Tracker');
                                     <input type="email" name="admin_email" class="form-control" required>
                                 </div>
                                 <div class="mb-4">
-                                    <label class="form-label text-muted">Super Admin Password</label>
+                                    <label>Super Admin Password</label>
                                     <input type="password" name="admin_pass" class="form-control" required minlength="6" placeholder="Choose a strong password">
                                 </div>
                             </div>
                             
                             <!-- Step 3: Application Settings -->
                             <div class="mb-4">
-                                <h5 class="text-primary border-bottom pb-2 mb-3">3. Application Settings</h5>
+                                <h5 class="border-bottom pb-2">3. Application Settings</h5>
                                 <div class="mb-3">
-                                    <label class="form-label text-muted">Site URL (Where is this app hosted?)</label>
+                                    <label>Site URL (Where is this app hosted?)</label>
                                     <?php 
                                         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
                                         $defaultUrl = $protocol . $_SERVER['HTTP_HOST'];
