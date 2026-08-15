@@ -1,5 +1,3 @@
-CREATE DATABASE IF NOT EXISTS `expense_tracker`;
-USE `expense_tracker`;
 
 DROP TABLE IF EXISTS `audit_logs`;
 DROP TABLE IF EXISTS `reminders`;

@@ -15,13 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_name = trim($_POST['admin_name']);
     $admin_email = trim($_POST['admin_email']);
     $admin_pass = trim($_POST['admin_pass']);
+    
+    $site_url = rtrim(trim($_POST['site_url']), '/');
 
     try {
-        // Step 1: Connect to MySQL without database to create it if it doesn't exist
-        $pdo = new PDO("mysql:host=$db_host", $db_user, $db_pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
-        $pdo->exec("USE `$db_name`");
+        // Step 1: Securely Connect to MySQL
+        try {
+            // Priority 1: Try connecting directly to the database (Shared Hosting / cPanel behavior)
+            $pdo = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'Unknown database') !== false) {
+                // Priority 2: Database doesn't exist, try connecting to server to create it (Localhost / Root behavior)
+                $pdo = new PDO("mysql:host=$db_host", $db_user, $db_pass);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
+                $pdo->exec("USE `$db_name`");
+            } else {
+                throw $e; // Rethrow if it's an Access Denied or Host Unreachable error
+            }
+        }
 
         // Step 2: Import database.sql schema
         $sqlFile = __DIR__ . '/../database.sql';
@@ -45,7 +58,7 @@ define('DB_USER', '$db_user');
 define('DB_PASS', '$db_pass');
 define('DB_NAME', '$db_name');
 define('APPROOT', dirname(dirname(__FILE__)));
-define('URLROOT', 'http://localhost:8080');
+define('URLROOT', '$site_url');
 define('SITENAME', 'Daily Expense Tracker');
 ";
         file_put_contents(__DIR__ . '/../app/config/config.php', $configContent);
@@ -156,11 +169,28 @@ define('SITENAME', 'Daily Expense Tracker');
                                     <input type="email" name="admin_email" class="form-control" required>
                                 </div>
                                 <div class="mb-4">
-                                    <label>Admin Password</label>
-                                    <input type="password" name="admin_pass" class="form-control" required>
+                                    <label class="form-label text-muted">Super Admin Password</label>
+                                    <input type="password" name="admin_pass" class="form-control" required minlength="6" placeholder="Choose a strong password">
                                 </div>
+                            </div>
+                            
+                            <!-- Step 3: Application Settings -->
+                            <div class="mb-4">
+                                <h5 class="text-primary border-bottom pb-2 mb-3">3. Application Settings</h5>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Site URL (Where is this app hosted?)</label>
+                                    <?php 
+                                        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+                                        $defaultUrl = $protocol . $_SERVER['HTTP_HOST'];
+                                    ?>
+                                    <input type="url" name="site_url" class="form-control" required value="<?php echo htmlspecialchars($defaultUrl); ?>" placeholder="e.g. https://myexpenseapp.com">
+                                    <small class="text-muted">Do not include a trailing slash.</small>
+                                </div>
+                            </div>
 
-                                <button type="submit" class="btn btn-success btn-lg w-100">Run Setup & Install</button>
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                                🚀 Install System & Seed Demo Data
+                            </button>
                             </form>
                         <?php endif; ?>
                     </div>
