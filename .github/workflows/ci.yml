@@ -53,8 +53,8 @@ jobs:
 
       - name: Start PHP Built-in Server
         run: |
-          # Start server in the background pointing to the public directory
-          php -S 127.0.0.1:8080 -t public &
+          # Start server in the background using the custom routing script
+          php -S 127.0.0.1:8080 server.php &
           # Give it a second to start
           sleep 2
           
