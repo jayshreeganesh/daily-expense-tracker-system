@@ -146,7 +146,6 @@ class Admin {
             $demoAdminId = $this->db->lastInsertId();
         } else {
             $demoAdminId = $demoAdmin->id;
-            // Clear demo admin data so it gets fresh seed data
             $this->db->query('DELETE FROM categories WHERE user_id = :uid');
             $this->db->bind(':uid', $demoAdminId);
             $this->db->execute();
@@ -155,8 +154,31 @@ class Admin {
             $this->db->execute();
         }
 
-        // We will seed data for BOTH the current user AND the demo admin
-        $targetUsers = array_unique([$user_id, $demoAdminId]);
+        // 3. Ensure a Portfolio 'Demo User' exists (Standard Role)
+        $this->db->query('SELECT id FROM users WHERE email = :email');
+        $this->db->bind(':email', 'demouser@example.com');
+        $demoUser = $this->db->single();
+        
+        if (!$demoUser) {
+            $this->db->query('INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)');
+            $this->db->bind(':name', 'Demo User');
+            $this->db->bind(':email', 'demouser@example.com');
+            $this->db->bind(':password', password_hash('demouser123', PASSWORD_DEFAULT));
+            $this->db->bind(':role', 'user');
+            $this->db->execute();
+            $demoUserId = $this->db->lastInsertId();
+        } else {
+            $demoUserId = $demoUser->id;
+            $this->db->query('DELETE FROM categories WHERE user_id = :uid');
+            $this->db->bind(':uid', $demoUserId);
+            $this->db->execute();
+            $this->db->query('DELETE FROM reminders WHERE user_id = :uid');
+            $this->db->bind(':uid', $demoUserId);
+            $this->db->execute();
+        }
+
+        // We will seed data for the current user, demo admin, AND demo user
+        $targetUsers = array_unique([$user_id, $demoAdminId, $demoUserId]);
 
         $jsonData = json_decode(file_get_contents(APPROOT . '/config/demo_data.json'), true);
         $categories = $jsonData['categories'] ?? [];
