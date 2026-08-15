@@ -14,10 +14,7 @@
     "playwright.config.js",
     "phpunit.xml",
     ".gitignore",
-    "setup.php",
-    "demo_data.json",
     "zip_exclusions.json",
-    "database.sql",
     "setup.lock",
     "config.php"
   ]
