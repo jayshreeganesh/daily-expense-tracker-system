@@ -131,59 +131,43 @@ class Admin {
         $this->db->bind(':uid', $user_id);
         $this->db->execute();
 
-        // 2. Ensure the Portfolio 'Demo Admin' user exists for recruiters
-        $this->db->query('SELECT id FROM users WHERE email = :email');
-        $this->db->bind(':email', 'demoadmin@example.com');
-        $demoAdmin = $this->db->single();
-        
-        if (!$demoAdmin) {
-            $this->db->query('INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)');
-            $this->db->bind(':name', 'Demo Admin');
-            $this->db->bind(':email', 'demoadmin@example.com');
-            $this->db->bind(':password', password_hash('demoadmin123', PASSWORD_DEFAULT));
-            $this->db->bind(':role', 'admin');
-            $this->db->execute();
-            $demoAdminId = $this->db->lastInsertId();
-        } else {
-            $demoAdminId = $demoAdmin->id;
-            $this->db->query('DELETE FROM categories WHERE user_id = :uid');
-            $this->db->bind(':uid', $demoAdminId);
-            $this->db->execute();
-            $this->db->query('DELETE FROM reminders WHERE user_id = :uid');
-            $this->db->bind(':uid', $demoAdminId);
-            $this->db->execute();
-        }
-
-        // 3. Ensure a Portfolio 'Demo User' exists (Standard Role)
-        $this->db->query('SELECT id FROM users WHERE email = :email');
-        $this->db->bind(':email', 'demouser@example.com');
-        $demoUser = $this->db->single();
-        
-        if (!$demoUser) {
-            $this->db->query('INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)');
-            $this->db->bind(':name', 'Demo User');
-            $this->db->bind(':email', 'demouser@example.com');
-            $this->db->bind(':password', password_hash('demouser123', PASSWORD_DEFAULT));
-            $this->db->bind(':role', 'user');
-            $this->db->execute();
-            $demoUserId = $this->db->lastInsertId();
-        } else {
-            $demoUserId = $demoUser->id;
-            $this->db->query('DELETE FROM categories WHERE user_id = :uid');
-            $this->db->bind(':uid', $demoUserId);
-            $this->db->execute();
-            $this->db->query('DELETE FROM reminders WHERE user_id = :uid');
-            $this->db->bind(':uid', $demoUserId);
-            $this->db->execute();
-        }
-
-        // We will seed data for the current user, demo admin, AND demo user
-        $targetUsers = array_unique([$user_id, $demoAdminId, $demoUserId]);
-
         $jsonData = json_decode(file_get_contents(APPROOT . '/config/demo_data.json'), true);
+        $demoUsers = $jsonData['users'] ?? [];
         $categories = $jsonData['categories'] ?? [];
         $transactions = $jsonData['transactions'] ?? [];
         $reminders = $jsonData['reminders'] ?? [];
+
+        $targetUsers = [$user_id]; // Always seed current user
+
+        // 2. Ensure Portfolio Demo Users exist from JSON
+        foreach ($demoUsers as $demoUser) {
+            $this->db->query('SELECT id FROM users WHERE email = :email');
+            $this->db->bind(':email', $demoUser['email']);
+            $existingUser = $this->db->single();
+            
+            if (!$existingUser) {
+                $this->db->query('INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)');
+                $this->db->bind(':name', $demoUser['name']);
+                $this->db->bind(':email', $demoUser['email']);
+                $this->db->bind(':password', password_hash($demoUser['password'], PASSWORD_DEFAULT));
+                $this->db->bind(':role', $demoUser['role']);
+                $this->db->execute();
+                $demoUserId = $this->db->lastInsertId();
+            } else {
+                $demoUserId = $existingUser->id;
+                // Clear their data before re-seeding
+                $this->db->query('DELETE FROM categories WHERE user_id = :uid');
+                $this->db->bind(':uid', $demoUserId);
+                $this->db->execute();
+                $this->db->query('DELETE FROM reminders WHERE user_id = :uid');
+                $this->db->bind(':uid', $demoUserId);
+                $this->db->execute();
+            }
+            $targetUsers[] = $demoUserId;
+        }
+
+        // We will seed data for all target users
+        $targetUsers = array_unique($targetUsers);
         
         foreach($targetUsers as $targetUserId) {
             $catIds = [];

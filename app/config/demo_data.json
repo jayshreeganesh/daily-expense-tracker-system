@@ -1,4 +1,8 @@
 {
+  "users": [
+    {"name": "Demo Admin", "email": "demoadmin@example.com", "password": "demoadmin123", "role": "admin"},
+    {"name": "Demo User", "email": "demouser@example.com", "password": "demouser123", "role": "user"}
+  ],
   "categories": [
     {"name": "Office Supplies", "type": "expense", "color_code": "#6c757d"},
     {"name": "Travel", "type": "expense", "color_code": "#dc3545"},

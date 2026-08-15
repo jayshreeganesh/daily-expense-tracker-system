@@ -49,18 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$admin_name, $admin_email, $hashed_pass]);
         $admin_id = $pdo->lastInsertId();
 
-        // Step 3.1: Create Portfolio Demo Admin
-        $stmt->execute(['Demo Admin', 'demoadmin@example.com', password_hash('demoadmin123', PASSWORD_DEFAULT)]);
-        $demoAdminId = $pdo->lastInsertId();
-
-        // Step 3.2: Create Portfolio Demo User
-        $stmtUser = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'user')");
-        $stmtUser->execute(['Demo User', 'demouser@example.com', password_hash('demouser123', PASSWORD_DEFAULT)]);
-        $demoUserId = $pdo->lastInsertId();
-
-        // We need to seed data for all three accounts!
-        $targetUsers = [$admin_id, $demoAdminId, $demoUserId];
-
         // Step 4: Write config.php with dynamic URL resolution
         $configContent = "<?php
 define('DB_HOST', '$db_host');
@@ -80,8 +68,18 @@ define('SITENAME', 'Daily Expense Tracker');
         $jsonContent = file_get_contents(__DIR__ . '/../app/config/demo_data.json');
         if ($jsonContent) {
             $demoData = json_decode($jsonContent, true);
+            $demoUsers = $demoData['users'] ?? [];
             $categories = $demoData['categories'] ?? [];
             $transactions = $demoData['transactions'] ?? [];
+            $reminders = $demoData['reminders'] ?? [];
+
+            $targetUsers = [$admin_id];
+
+            $stmtUser = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+            foreach ($demoUsers as $demoUser) {
+                $stmtUser->execute([$demoUser['name'], $demoUser['email'], password_hash($demoUser['password'], PASSWORD_DEFAULT), $demoUser['role']]);
+                $targetUsers[] = $pdo->lastInsertId();
+            }
 
             $stmtCat = $pdo->prepare("INSERT INTO categories (user_id, name, type, color_code) VALUES (?, ?, ?, ?)");
             $stmtTxn = $pdo->prepare("INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (?, ?, ?, ?, ?, ?)");
