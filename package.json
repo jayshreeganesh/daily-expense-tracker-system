@@ -1,0 +1,19 @@
+{
+  "name": "daily-expense-tracker-system",
+  "version": "1.0.0",
+  "description": "A professional, responsive, and dynamic Expense Tracker built from scratch using a Custom PHP MVC framework, MySQL, Bootstrap 5, and Alpine.js. This MVP is designed to be highly presentable for a portfolio, showcasing a deep understanding of core programming concepts, design patterns, and modern frontend interactivity.",
+  "main": "playwright.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

@@ -6,8 +6,12 @@
 
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
-// Serve existing files in the public directory as-is
+// Serve existing files in the public directory
 if ($uri !== '/' && file_exists(__DIR__.'/public'.$uri)) {
+    if (pathinfo($uri, PATHINFO_EXTENSION) === 'php') {
+        require_once __DIR__.'/public'.$uri;
+        exit;
+    }
     return false;
 }
 

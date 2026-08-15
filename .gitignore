@@ -1,0 +1,10 @@
+node_modules/
+tests/
+test-results/
+playwright-report/
+screenshots/
+setup.lock
+app/config/config.php
+project_export.zip
+*.sql
+!database.sql
