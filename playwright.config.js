@@ -14,24 +14,24 @@ module.exports = defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'Desktop_1080p',
+      use: { browserName: 'chromium', viewport: { width: 1920, height: 1080 } },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'Laptop',
+      use: { browserName: 'chromium', viewport: { width: 1366, height: 768 } },
     },
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: 'Tablet_Landscape',
+      use: { browserName: 'chromium', viewport: { width: 1024, height: 768 } },
     },
     {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      name: 'Tablet_Portrait',
+      use: { browserName: 'chromium', viewport: { width: 768, height: 1024 } },
     },
     {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      name: 'Mobile',
+      use: { browserName: 'chromium', viewport: { width: 375, height: 812 }, isMobile: true },
     },
   ],
 });
