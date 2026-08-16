@@ -3,17 +3,17 @@
 <div class="container mt-4" x-data="{ showModal: false }">
     <?php flash('transaction_message'); ?>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
         <h2>Transactions</h2>
-        <div class="d-flex align-items-center">
-            <form action="<?= URLROOT ?>/transaction/index" method="get" class="d-flex me-3">
+        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+            <form action="<?= URLROOT ?>/transaction/index" method="get" class="d-flex">
                 <input type="month" name="month" class="form-control me-2" value="<?= $data['month'] ?? '' ?>" onchange="this.form.submit()">
                 <?php if(!empty($data['month'])): ?>
                     <a href="<?= URLROOT ?>/transaction" class="btn btn-outline-secondary">Clear</a>
                 <?php endif; ?>
             </form>
-            <a href="<?= URLROOT ?>/transaction/export" class="btn btn-outline-success me-2">Export CSV</a>
-            <a href="<?= URLROOT ?>/transaction/exportPdf<?= !empty($data['month']) ? '?month=' . $data['month'] : '' ?>" class="btn btn-outline-danger me-2">Export PDF</a>
+            <a href="<?= URLROOT ?>/transaction/export" class="btn btn-outline-success">Export CSV</a>
+            <a href="<?= URLROOT ?>/transaction/exportPdf<?= !empty($data['month']) ? '?month=' . $data['month'] : '' ?>" class="btn btn-outline-danger">Export PDF</a>
             <button @click="showModal = true" class="btn btn-primary">+ Add Transaction</button>
         </div>
     </div>

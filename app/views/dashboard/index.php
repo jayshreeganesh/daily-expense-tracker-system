@@ -1,7 +1,7 @@
 <?php require_once APPROOT . '/views/layouts/header.php'; ?>
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
         <h2>Dashboard</h2>
         <a href="<?= URLROOT ?>/transaction" class="btn btn-primary">+ New Transaction</a>
     </div>

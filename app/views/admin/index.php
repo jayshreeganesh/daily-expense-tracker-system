@@ -1,15 +1,15 @@
 <?php require_once APPROOT . '/views/layouts/header.php'; ?>
 
 <div class="container mt-4" x-data="{ showImportModal: false, showUserModal: false }">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-4 gap-3">
         <h2><span class="text-info">⚙️</span> Super Admin Dashboard</h2>
-        <div>
+        <div class="d-flex flex-wrap gap-2">
             <?php if($_SESSION['user_role'] === 'admin'): ?>
-                <a href="<?= URLROOT ?>/admin/seedData" class="btn btn-secondary shadow-sm me-1">🌱 Seed Data</a>
-                <a href="<?= URLROOT ?>/admin/createZip?v=<?= time() ?>" class="btn btn-dark shadow-sm me-1">📦 Export Project</a>
+                <a href="<?= URLROOT ?>/admin/seedData" class="btn btn-secondary shadow-sm">🌱 Seed Data</a>
+                <a href="<?= URLROOT ?>/admin/createZip?v=<?= time() ?>" class="btn btn-dark shadow-sm">📦 Export Project</a>
             <?php endif; ?>
-            <button @click="showUserModal = true" class="btn btn-success shadow-sm me-1">👤 Add User</button>
-            <button @click="showImportModal = true" class="btn btn-primary shadow-sm me-1">📤 Import CSV</button>
+            <button @click="showUserModal = true" class="btn btn-success shadow-sm">👤 Add User</button>
+            <button @click="showImportModal = true" class="btn btn-primary shadow-sm">📤 Import CSV</button>
             <?php if($_SESSION['user_role'] === 'admin'): ?>
                 <a href="<?= URLROOT ?>/admin/backup?v=<?= time() ?>" class="btn btn-warning shadow-sm">📥 Backup DB</a>
             <?php endif; ?>
