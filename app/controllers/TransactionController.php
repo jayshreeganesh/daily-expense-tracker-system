@@ -34,20 +34,53 @@ class TransactionController extends Controller {
         $this->view('transactions/index', $data);
     }
 
+    private function getBaseCurrencyCode() {
+        $symbol = defined('CURRENCY_SYMBOL') ? CURRENCY_SYMBOL : '$';
+        $map = [
+            '$' => 'USD', '€' => 'EUR', '£' => 'GBP',
+            '₹' => 'INR', '¥' => 'JPY', 'A$' => 'AUD', 'C$' => 'CAD'
+        ];
+        return $map[$symbol] ?? 'USD';
+    }
+
     public function add() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
+            $original_amount = (float)trim($_POST['amount']);
+            $original_currency = trim($_POST['currency'] ?? $this->getBaseCurrencyCode());
+            $base_currency = $this->getBaseCurrencyCode();
+            $exchange_rate = 1.0000;
+            $amount = $original_amount;
+
+            if ($original_currency !== $base_currency) {
+                $ch = curl_init("https://open.er-api.com/v6/latest/" . urlencode($original_currency));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+                $response = curl_exec($ch);
+                curl_close($ch);
+                if ($response) {
+                    $apiData = json_decode($response, true);
+                    if (isset($apiData['rates'][$base_currency])) {
+                        $exchange_rate = (float)$apiData['rates'][$base_currency];
+                        $amount = $original_amount * $exchange_rate;
+                    }
+                }
+            }
+
             $data = [
                 'user_id' => $_SESSION['user_id'],
                 'category_id' => trim($_POST['category_id']),
-                'amount' => trim($_POST['amount']),
+                'amount' => $amount,
+                'original_currency' => $original_currency,
+                'original_amount' => $original_amount,
+                'exchange_rate' => $exchange_rate,
                 'type' => trim($_POST['type']),
                 'transaction_date' => trim($_POST['transaction_date']),
                 'description' => trim($_POST['description'])
             ];
 
-            if (!empty($data['category_id']) && !empty($data['amount']) && !empty($data['transaction_date'])) {
+            if (!empty($data['category_id']) && $original_amount > 0 && !empty($data['transaction_date'])) {
                 if ($this->transactionModel->addTransaction($data)) {
                     flash('transaction_message', 'Transaction Added Successfully');
                     header('Location: ' . URLROOT . '/transaction');
@@ -56,7 +89,7 @@ class TransactionController extends Controller {
                     die('Something went wrong');
                 }
             } else {
-                flash('transaction_message', 'Please fill all required fields', 'alert alert-danger');
+                flash('transaction_message', 'Please fill all required fields with valid amounts', 'alert alert-danger');
                 header('Location: ' . URLROOT . '/transaction');
                 exit;
             }

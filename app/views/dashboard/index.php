@@ -66,7 +66,10 @@
                                         </span>
                                     </td>
                                     <td class="fw-bold <?= $tx->type == 'income' ? 'text-success' : 'text-danger' ?>">
-                                        <?= $tx->type == 'income' ? '+' : '-' ?><?= CURRENCY_SYMBOL ?><?= number_format($tx->amount, 2) ?>
+                                        <div><?= $tx->type == 'income' ? '+' : '-' ?><?= CURRENCY_SYMBOL ?><?= number_format($tx->amount, 2) ?></div>
+                                        <?php if(isset($tx->original_currency) && $tx->exchange_rate != 1.0000 && $tx->original_amount != $tx->amount): ?>
+                                            <small class="text-muted fw-normal">(<?= $tx->original_currency ?> <?= number_format($tx->original_amount, 2) ?>)</small>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

@@ -73,10 +73,13 @@ class Transaction {
     }
 
     public function addTransaction($data) {
-        $this->db->query('INSERT INTO transactions (user_id, category_id, amount, type, transaction_date, description) VALUES (:user_id, :category_id, :amount, :type, :transaction_date, :description)');
+        $this->db->query('INSERT INTO transactions (user_id, category_id, amount, original_currency, original_amount, exchange_rate, type, transaction_date, description) VALUES (:user_id, :category_id, :amount, :original_currency, :original_amount, :exchange_rate, :type, :transaction_date, :description)');
         $this->db->bind(':user_id', $data['user_id']);
         $this->db->bind(':category_id', $data['category_id']);
         $this->db->bind(':amount', $data['amount']);
+        $this->db->bind(':original_currency', $data['original_currency'] ?? 'USD');
+        $this->db->bind(':original_amount', $data['original_amount'] ?? $data['amount']);
+        $this->db->bind(':exchange_rate', $data['exchange_rate'] ?? 1.0000);
         $this->db->bind(':type', $data['type']);
         $this->db->bind(':transaction_date', $data['transaction_date']);
         $this->db->bind(':description', $data['description']);

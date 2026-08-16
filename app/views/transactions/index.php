@@ -45,7 +45,10 @@
                                         </span>
                                     </td>
                                     <td class="fw-bold <?= $tx->type == 'income' ? 'text-success' : 'text-danger' ?>">
-                                        <?= $tx->type == 'income' ? '+' : '-' ?><?= CURRENCY_SYMBOL ?><?= number_format($tx->amount, 2) ?>
+                                        <div><?= $tx->type == 'income' ? '+' : '-' ?><?= CURRENCY_SYMBOL ?><?= number_format($tx->amount, 2) ?></div>
+                                        <?php if(isset($tx->original_currency) && $tx->exchange_rate != 1.0000 && $tx->original_amount != $tx->amount): ?>
+                                            <small class="text-muted fw-normal">(<?= $tx->original_currency ?> <?= number_format($tx->original_amount, 2) ?>)</small>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <form action="<?= URLROOT; ?>/transaction/delete/<?= $tx->id ?>" method="post" class="d-inline">
@@ -102,8 +105,20 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Amount</label>
-                            <input type="number" step="0.01" name="amount" class="form-control" required placeholder="0.00">
+                            <label class="form-label">Amount & Currency</label>
+                            <div class="input-group">
+                                <select name="currency" class="form-select" style="max-width: 100px;">
+                                    <option value="USD" <?= CURRENCY_SYMBOL == '$' ? 'selected' : '' ?>>USD</option>
+                                    <option value="EUR" <?= CURRENCY_SYMBOL == '€' ? 'selected' : '' ?>>EUR</option>
+                                    <option value="GBP" <?= CURRENCY_SYMBOL == '£' ? 'selected' : '' ?>>GBP</option>
+                                    <option value="INR" <?= CURRENCY_SYMBOL == '₹' ? 'selected' : '' ?>>INR</option>
+                                    <option value="JPY" <?= CURRENCY_SYMBOL == '¥' ? 'selected' : '' ?>>JPY</option>
+                                    <option value="CAD">CAD</option>
+                                    <option value="AUD">AUD</option>
+                                </select>
+                                <input type="number" step="0.01" name="amount" class="form-control" required placeholder="0.00">
+                            </div>
+                            <small class="text-muted mt-1 d-block">Live exchange rates will be applied if currency differs from system default.</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Date</label>

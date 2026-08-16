@@ -219,6 +219,7 @@ define('URLROOT', \$protocol . \$_SERVER['HTTP_HOST']);
                                         <select name="timezone" class="form-control" required>
                                             <option value="UTC">UTC</option>
                                             <option value="America/New_York">America/New_York</option>
+
                                             <option value="Europe/London">Europe/London</option>
                                             <option value="Asia/Kolkata">Asia/Kolkata</option>
                                             <option value="Australia/Sydney">Australia/Sydney</option>
