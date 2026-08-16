@@ -24,6 +24,7 @@ class DashboardController extends Controller {
         
         $expensesByCategory = $this->transactionModel->getExpensesByCategory($user_id);
         $weeklyTrends = $this->transactionModel->getWeeklyTrends($user_id);
+        $sixMonthTrends = $this->transactionModel->getSixMonthTrends($user_id);
 
         $data = [
             'title' => 'Dashboard',
@@ -32,7 +33,8 @@ class DashboardController extends Controller {
             'currentMonthSummary' => $currentMonthSummary,
             'monthly_budget' => $monthly_budget,
             'chartData' => $expensesByCategory,
-            'weeklyTrends' => $weeklyTrends
+            'weeklyTrends' => $weeklyTrends,
+            'sixMonthTrends' => $sixMonthTrends
         ];
         
         $this->view('dashboard/index', $data);

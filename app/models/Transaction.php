@@ -117,4 +117,18 @@ class Transaction {
         $this->db->bind(':user_id', $user_id);
         return $this->db->resultSet();
     }
+
+    public function getSixMonthTrends($user_id) {
+        $this->db->query('
+            SELECT DATE_FORMAT(transaction_date, "%Y-%m") as month_label, SUM(amount) as total 
+            FROM transactions 
+            WHERE user_id = :user_id 
+            AND type = "expense" 
+            AND transaction_date >= DATE_FORMAT(DATE_SUB(CURRENT_DATE, INTERVAL 5 MONTH), "%Y-%m-01")
+            GROUP BY month_label 
+            ORDER BY month_label ASC
+        ');
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->resultSet();
+    }
 }

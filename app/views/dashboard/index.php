@@ -149,6 +149,19 @@
                     <?php endif; ?>
                 </div>
             </div>
+            
+            <div class="card shadow-sm h-100 mt-3">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">6-Month Trends</h5>
+                </div>
+                <div class="card-body">
+                    <?php if(empty($data['sixMonthTrends'])) : ?>
+                        <p class="text-center text-muted mt-5">No 6-month data available.</p>
+                    <?php else : ?>
+                        <canvas id="sixMonthTrendsChart"></canvas>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -196,6 +209,39 @@
                         data: data2,
                         backgroundColor: '#dc3545',
                         borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        const sixMonthData = <?= json_encode($data['sixMonthTrends'] ?? []) ?>;
+        if(sixMonthData && sixMonthData.length > 0) {
+            const ctx3 = document.getElementById('sixMonthTrendsChart').getContext('2d');
+            const labels3 = sixMonthData.map(item => {
+                // Convert YYYY-MM to readable month name (e.g. Jan 2026)
+                const date = new Date(item.month_label + "-01");
+                return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            });
+            const data3 = sixMonthData.map(item => item.total);
+
+            new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: labels3,
+                    datasets: [{
+                        label: 'Monthly Expenses',
+                        data: data3,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
                     }]
                 },
                 options: {
