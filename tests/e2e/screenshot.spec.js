@@ -24,7 +24,7 @@ test('capture screenshots of the application', async ({ page }) => {
   await page.goto(`${baseUrl}/auth/login`);
   await page.fill('input[name="email"]', 'demoadmin@example.com');
   await page.fill('input[name="password"]', 'demoadmin123');
-  await page.click('button[type="submit"]');
+  await page.click('input[type="submit"]');
   await page.waitForLoadState('networkidle');
 
   // 4. Admin Dashboard
@@ -39,7 +39,7 @@ test('capture screenshots of the application', async ({ page }) => {
   await page.goto(`${baseUrl}/auth/login`);
   await page.fill('input[name="email"]', 'demouser@example.com');
   await page.fill('input[name="password"]', 'demouser123');
-  await page.click('button[type="submit"]');
+  await page.click('input[type="submit"]');
   await page.waitForLoadState('networkidle');
 
   // 7. User Dashboard
