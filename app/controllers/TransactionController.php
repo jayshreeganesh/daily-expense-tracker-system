@@ -141,6 +141,12 @@ class TransactionController extends Controller {
     }
 
     public function exportPdf() {
+        if (!isset($_SESSION['subscription_tier']) || $_SESSION['subscription_tier'] !== 'premium') {
+            flash('transaction_message', 'PDF Export is a Premium feature. <a href="' . URLROOT . '/subscription/upgrade" class="alert-link">Upgrade now!</a>', 'alert alert-warning');
+            header('Location: ' . URLROOT . '/transaction');
+            exit;
+        }
+
         $month = !empty($_GET['month']) ? $_GET['month'] : null;
         $transactions = $this->transactionModel->getTransactionsByUser($_SESSION['user_id'], 10000, 0, $month);
         

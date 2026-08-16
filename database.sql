@@ -14,6 +14,9 @@ CREATE TABLE `users` (
   `reset_token` varchar(255) DEFAULT NULL,
   `reset_expires` datetime DEFAULT NULL,
   `monthly_budget` decimal(10,2) DEFAULT NULL,
+  `stripe_customer_id` varchar(255) DEFAULT NULL,
+  `subscription_status` enum('active','inactive','canceled') DEFAULT 'inactive',
+  `subscription_tier` enum('free','premium') DEFAULT 'free',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)

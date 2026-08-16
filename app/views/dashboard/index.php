@@ -3,7 +3,12 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
         <h2>Dashboard</h2>
-        <a href="<?= URLROOT ?>/transaction" class="btn btn-primary">+ New Transaction</a>
+        <div class="d-flex gap-2">
+            <?php if (!isset($_SESSION['subscription_tier']) || $_SESSION['subscription_tier'] !== 'premium'): ?>
+                <a href="<?= URLROOT ?>/subscription/upgrade" class="btn btn-warning shadow-sm">⭐ Upgrade to Premium</a>
+            <?php endif; ?>
+            <a href="<?= URLROOT ?>/transaction" class="btn btn-primary">+ New Transaction</a>
+        </div>
     </div>
 
     <?php if (!empty($data['monthly_budget']) && $data['monthly_budget'] > 0): 

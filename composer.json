@@ -11,5 +11,8 @@
             "app/models",
             "app/helpers"
         ]
+    },
+    "require": {
+        "stripe/stripe-php": "^21.2"
     }
 }

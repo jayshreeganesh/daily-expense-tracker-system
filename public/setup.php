@@ -23,6 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $expense_cats = trim($_POST['expense_cats']);
     $income_cats = trim($_POST['income_cats']);
     
+    $stripe_pub = trim($_POST['stripe_publishable_key'] ?? '');
+    $stripe_sec = trim($_POST['stripe_secret_key'] ?? '');
+    $stripe_web = trim($_POST['stripe_webhook_secret'] ?? '');
+    
     try {
         // Step 1: Securely Connect to MySQL
         try {
@@ -52,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Step 3: Create Super Admin Account
         $hashed_pass = password_hash($admin_pass, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')");
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role, subscription_tier) VALUES (?, ?, ?, 'admin', 'premium')");
         $stmt->execute([$admin_name, $admin_email, $hashed_pass]);
         $admin_id = $pdo->lastInsertId();
 
@@ -71,6 +75,12 @@ define('TIMEZONE', '" . addslashes($timezone) . "');
 define('BRAND_COLOR', '" . addslashes($brand_color) . "');
 define('DEFAULT_EXPENSE_CATEGORIES', '" . addslashes($expense_cats) . "');
 define('DEFAULT_INCOME_CATEGORIES', '" . addslashes($income_cats) . "');
+
+// Stripe Configuration
+define('STRIPE_PUBLISHABLE_KEY', '" . addslashes($stripe_pub) . "');
+define('STRIPE_SECRET_KEY', '" . addslashes($stripe_sec) . "');
+define('STRIPE_WEBHOOK_SECRET', '" . addslashes($stripe_web) . "');
+
 date_default_timezone_set(TIMEZONE);
 
 // Dynamically determine the URLROOT based on the current server host
@@ -243,6 +253,22 @@ define('URLROOT', \$protocol . \$_SERVER['HTTP_HOST']);
                                     <input type="color" name="brand_color" class="form-control form-control-color w-100" value="#0d6efd" required>
                                 </div>
                             </div>
+
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">4. Stripe Integration (Optional)</h5>
+                                    <div class="mb-3">
+                                        <label>Stripe Publishable Key</label>
+                                        <input type="text" name="stripe_publishable_key" class="form-control" placeholder="pk_test_...">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Stripe Secret Key</label>
+                                        <input type="password" name="stripe_secret_key" class="form-control" placeholder="sk_test_...">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Stripe Webhook Secret</label>
+                                        <input type="password" name="stripe_webhook_secret" class="form-control" placeholder="whsec_...">
+                                    </div>
+                                </div>
 
                             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
                                 🚀 Install System & Seed Demo Data
