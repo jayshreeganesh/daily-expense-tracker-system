@@ -49,9 +49,18 @@ class Transaction {
         return $this->db->single()->total;
     }
 
-    public function getSummaryByUser($user_id) {
-        $this->db->query('SELECT type, SUM(amount) as total FROM transactions WHERE user_id = :user_id GROUP BY type');
+    public function getSummaryByUser($user_id, $month = null) {
+        $sql = 'SELECT type, SUM(amount) as total FROM transactions WHERE user_id = :user_id';
+        if ($month) {
+            $sql .= ' AND DATE_FORMAT(transaction_date, "%Y-%m") = :month';
+        }
+        $sql .= ' GROUP BY type';
+
+        $this->db->query($sql);
         $this->db->bind(':user_id', $user_id);
+        if ($month) {
+            $this->db->bind(':month', $month);
+        }
         $results = $this->db->resultSet();
         
         $summary = ['income' => 0, 'expense' => 0, 'balance' => 0];

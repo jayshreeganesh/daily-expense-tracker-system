@@ -64,6 +64,17 @@ class ProfileController extends Controller {
                         exit;
                     }
                 }
+            } elseif (isset($_POST['update_budget'])) {
+                $budget = trim($_POST['monthly_budget']);
+                if (is_numeric($budget) && $budget >= 0) {
+                    if ($this->userModel->updateBudget($_SESSION['user_id'], $budget)) {
+                        flash('profile_message', 'Monthly Budget Updated Successfully');
+                        header('Location: ' . URLROOT . '/profile');
+                        exit;
+                    }
+                } else {
+                    flash('profile_message', 'Invalid budget amount', 'alert alert-danger');
+                }
             } elseif (isset($_POST['delete_account'])) {
                 if ($this->userModel->deleteAccount($_SESSION['user_id'])) {
                     header('Location: ' . URLROOT . '/auth/logout');

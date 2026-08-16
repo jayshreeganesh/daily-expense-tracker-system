@@ -13,6 +13,7 @@ CREATE TABLE `users` (
   `role` enum('user','recruiter','admin') NOT NULL DEFAULT 'user',
   `reset_token` varchar(255) DEFAULT NULL,
   `reset_expires` datetime DEFAULT NULL,
+  `monthly_budget` decimal(10,2) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)

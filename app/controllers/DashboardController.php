@@ -13,8 +13,15 @@ class DashboardController extends Controller {
 
     public function index() {
         $user_id = $_SESSION['user_id'];
+        
+        $userModel = $this->model('User');
+        $user = $userModel->getUserById($user_id);
+        $monthly_budget = $user->monthly_budget;
+
         $transactions = $this->transactionModel->getTransactionsByUser($user_id, 5); // get last 5
         $summary = $this->transactionModel->getSummaryByUser($user_id);
+        $currentMonthSummary = $this->transactionModel->getSummaryByUser($user_id, date('Y-m'));
+        
         $expensesByCategory = $this->transactionModel->getExpensesByCategory($user_id);
         $weeklyTrends = $this->transactionModel->getWeeklyTrends($user_id);
 
@@ -22,6 +29,8 @@ class DashboardController extends Controller {
             'title' => 'Dashboard',
             'transactions' => $transactions,
             'summary' => $summary,
+            'currentMonthSummary' => $currentMonthSummary,
+            'monthly_budget' => $monthly_budget,
             'chartData' => $expensesByCategory,
             'weeklyTrends' => $weeklyTrends
         ];

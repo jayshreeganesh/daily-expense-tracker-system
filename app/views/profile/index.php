@@ -46,6 +46,22 @@
                 </div>
             </div>
 
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Budget Settings</h4>
+                </div>
+                <div class="card-body">
+                    <form action="<?= URLROOT; ?>/profile/index" method="post">
+                        <div class="mb-3">
+                            <label>Monthly Budget Amount: (<?= CURRENCY_SYMBOL ?>)</label>
+                            <input type="number" step="0.01" min="0" name="monthly_budget" class="form-control" value="<?= htmlspecialchars($data['user']->monthly_budget ?? '0.00'); ?>" placeholder="Enter your monthly budget">
+                            <small class="text-muted">Set to 0 to disable budgeting alerts.</small>
+                        </div>
+                        <button type="submit" name="update_budget" class="btn btn-info text-white">Save Budget</button>
+                    </form>
+                </div>
+            </div>
+
             <div class="card shadow-sm border-danger">
                 <div class="card-header bg-danger text-white">
                     <h4 class="mb-0">Danger Zone</h4>

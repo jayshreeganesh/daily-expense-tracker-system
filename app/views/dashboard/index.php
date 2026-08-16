@@ -6,6 +6,43 @@
         <a href="<?= URLROOT ?>/transaction" class="btn btn-primary">+ New Transaction</a>
     </div>
 
+    <?php if (!empty($data['monthly_budget']) && $data['monthly_budget'] > 0): 
+        $budget = $data['monthly_budget'];
+        $spent = $data['currentMonthSummary']['expense'] ?? 0;
+        $percentage = ($spent / $budget) * 100;
+        $percent_display = min(100, max(0, $percentage));
+        
+        $progress_class = 'bg-success';
+        $alert_class = '';
+        $alert_message = '';
+        if ($percentage >= 90) {
+            $progress_class = 'bg-danger';
+            $alert_class = 'alert alert-danger';
+            $alert_message = '<strong>🚨 Budget Warning:</strong> You have spent ' . number_format($percentage, 1) . '% of your monthly budget!';
+        } elseif ($percentage >= 75) {
+            $progress_class = 'bg-warning text-dark';
+            $alert_class = 'alert alert-warning';
+            $alert_message = '<strong>⚠️ Heads up:</strong> You are approaching your monthly budget limit (' . number_format($percentage, 1) . '% spent).';
+        }
+    ?>
+        <?php if($alert_message): ?>
+            <div class="<?= $alert_class ?> shadow-sm mb-3">
+                <?= $alert_message ?>
+            </div>
+        <?php endif; ?>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body py-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-bold text-muted">Monthly Budget Usage</span>
+                    <span class="fw-bold"><?= CURRENCY_SYMBOL ?><?= number_format($spent, 2) ?> / <?= CURRENCY_SYMBOL ?><?= number_format($budget, 2) ?></span>
+                </div>
+                <div class="progress" style="height: 12px; border-radius: 6px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated <?= $progress_class ?>" role="progressbar" style="width: <?= $percent_display ?>%;" aria-valuenow="<?= $percent_display ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Summary Cards -->
     <div class="row mb-4">
         <div class="col-md-4">

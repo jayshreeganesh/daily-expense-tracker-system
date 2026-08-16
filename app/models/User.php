@@ -92,6 +92,13 @@ class User {
         return $this->db->execute();
     }
 
+    public function updateBudget($id, $budget) {
+        $this->db->query('UPDATE users SET monthly_budget = :budget WHERE id = :id');
+        $this->db->bind(':budget', $budget);
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
+
     public function updatePassword($id, $password) {
         $this->db->query('UPDATE users SET password = :password WHERE id = :id');
         $this->db->bind(':password', password_hash($password, PASSWORD_DEFAULT));
